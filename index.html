@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>GARGANTUA // 卡冈都亚</title>
+  <script type="module">
+const d=document.getElementById("glcanvas"),t=d.getContext("webgl",{alpha:!1,depth:!1,stencil:!1,antialias:!1,preserveDrawingBuffer:!1,powerPreference:"high-performance"})||d.getContext("experimental-webgl");if(!t)throw document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#e5c89b;font-size:0.9rem;z-index:999;">您的浏览器不支持 WebGL，无法运行实时黑洞模拟。</div>'),new Error("WebGL not supported");function lt(e,o=512){const a=new Uint8Array(o*o*4),r=new Float32Array(o*o*3);for(let c=0;c<o*o*3;c++){const h=Math.sin(c*12.9898+78.233)*43758.5453;r[c]=h-Math.floor(h)}function i(c,h,v,T,p,U){const A=c+p,E=h+U,b=Math.floor(A),D=Math.floor(E),S=(b%v+v)%v,_=(D%v+v)%v,y=(S+1)%v,G=(_+1)%v,L=A-b,M=E-D,J=L*L*L*(L*(L*6-15)+10),Q=M*M*M*(M*(M*6-15)+10),ee=_*o,Ae=G*o,_e=r[(ee+S)*3+T],it=r[(ee+y)*3+T],Fe=r[(Ae+S)*3+T],st=r[(Ae+y)*3+T];return(_e+(it-_e)*J)*(1-Q)+(Fe+(st-Fe)*J)*Q}const u=1/o;for(let c=0;c<o;c++){const h=c*u;for(let v=0;v<o;v++){const T=v*u;let p=0,U=0,A=0,E=.5,b=5;for(let S=0;S<5;S++){const _=S*3.71,y=S*5.13,G=T*b,L=h*b,M=i(G,L,b,0,_,y),J=i(G*2,L*2,b*2,1,y,_),Q=i(G,L,b,2,_+2.1,y+1.7),ee=Math.sqrt(Math.abs(Q*2-1));p+=E*M,U+=E*J,A+=E*ee,b*=2,E*=.5}const D=(c*o+v)*4;a[D]=Math.min(255,Math.max(0,p*255|0)),a[D+1]=Math.min(255,Math.max(0,U*255|0)),a[D+2]=Math.min(255,Math.max(0,A*255|0)),a[D+3]=255}}const m=e.createTexture();e.bindTexture(e.TEXTURE_2D,m),e.texImage2D(e.TEXTURE_2D,0,e.RGBA,o,o,0,e.RGBA,e.UNSIGNED_BYTE,a),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.REPEAT),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.REPEAT),e.generateMipmap(e.TEXTURE_2D),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,e.LINEAR_MIPMAP_LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,e.LINEAR);const f=e.getExtension("EXT_texture_filter_anisotropic")||e.getExtension("MOZ_EXT_texture_filter_anisotropic")||e.getExtension("WEBKIT_EXT_texture_filter_anisotropic");if(f){const c=e.getParameter(f.MAX_TEXTURE_MAX_ANISOTROPY_EXT);e.texParameterf(e.TEXTURE_2D,f.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(16,c))}return m}function Ue(e,o,a){const r=e.createShader(o);return e.shaderSource(r,a),e.compileShader(r),e.getShaderParameter(r,e.COMPILE_STATUS)?r:(console.error("Shader compile error:",e.getShaderInfoLog(r)),e.deleteShader(r),null)}function He(e,o,a,r){const i=Ue(e,e.VERTEX_SHADER,o),u=Ue(e,e.FRAGMENT_SHADER,a),m=e.createProgram();return i&&e.attachShader(m,i),u&&e.attachShader(m,u),e.linkProgram(m),e.getProgramParameter(m,e.LINK_STATUS)||console.error(`[${r||"program"}] Program link error:`,e.getProgramInfoLog(m)),m}const ct=`      attribute vec2 aPosition;
+      varying vec2 vUv;
+      void main() {
+        vUv = aPosition;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+`,ut=`      precision highp float;
+      precision highp int;
+      precision highp sampler2D;
+      varying vec2 vUv;
+
+      uniform int uFace;
+      uniform int uPass;
+      uniform vec3 uGalUp;
+      uniform vec3 uGalRight;
+      uniform vec3 uGalForward;
+      uniform vec3 uCloudDir1;
+      uniform vec3 uCloudDir2;
+      uniform vec3 uCloudDir3;
+      uniform vec4 uCosmosSeed;
+      uniform sampler2D uNoiseTex;
+
+      vec3 getCubeDir(int face, vec2 uv) {
+        float u = uv.x;
+        float v = uv.y;
+        if (face == 0) return normalize(vec3( 1.0, -v, -u));
+        if (face == 1) return normalize(vec3(-1.0, -v,  u));
+        if (face == 2) return normalize(vec3( u,  1.0,  v));
+        if (face == 3) return normalize(vec3( u, -1.0, -v));
+        if (face == 4) return normalize(vec3( u, -v,  1.0));
+        return normalize(vec3(-u, -v, -1.0));
+      }
+
+      void sample3DOrganicNebula(vec3 p, out vec3 outLow, out vec3 outHigh) {
+        vec3 ap = abs(p);
+        vec3 w = ap * ap * ap * sqrt(ap);
+        w /= (w.x + w.y + w.z + 1e-5);
+
+        vec2 uvX = p.yz * 0.52 + uCosmosSeed.xy;
+        vec2 uvY = p.zx * 0.52 + uCosmosSeed.zw;
+        vec2 uvZ = p.xy * 0.52 + uCosmosSeed.yx;
+
+        outLow = texture2D(uNoiseTex, uvX).rgb * w.x
+                + texture2D(uNoiseTex, uvY).rgb * w.y
+                + texture2D(uNoiseTex, uvZ).rgb * w.z;
+
+        vec2 curlWarp = vec2(outLow.r - outLow.g, outLow.b - outLow.r) * 0.34;
+
+        outHigh = texture2D(uNoiseTex, uvX * 2.15 + curlWarp).rgb * w.x
+                + texture2D(uNoiseTex, uvY * 2.15 - curlWarp.yx).rgb * w.y
+                + texture2D(uNoiseTex, uvZ * 2.15 + vec2(curlWarp.y, -curlWarp.x)).rgb * w.z;
+      }
+
+      void main() {
+        vec3 dir = getCubeDir(uFace, vUv);
+        vec3 p = vec3(dot(dir, uGalRight), dot(dir, uGalUp), dot(dir, uGalForward));
+
+        vec3 nLow, nHigh;
+        sample3DOrganicNebula(p, nLow, nHigh);
+
+        float meanderLat = p.y + (nLow.r - 0.5) * 0.58 + (nHigh.g - 0.5) * 0.24;
+        float dynamicWidth = 1.1 + 2.4 * smoothstep(0.20, 0.85, nLow.b);
+        float diffuseBand = exp(-meanderLat * meanderLat * dynamicWidth);
+        float longitudinalBreak = smoothstep(0.32, 0.78, nLow.g * 0.60 + nHigh.r * 0.40);
+        float brokenStream = diffuseBand * longitudinalBreak;
+
+        float d1 = max(0.0, dot(dir, uCloudDir1));
+        float d2 = max(0.0, dot(dir, uCloudDir2));
+        float d3 = max(0.0, dot(dir, uCloudDir3));
+        float d1_2 = d1 * d1;
+        float d2_2 = d2 * d2; float d2_4 = d2_2 * d2_2;
+        float d3_2 = d3 * d3; float d3_4 = d3_2 * d3_2;
+
+        float patch1 = (d1_2 * d1_2 * d1 * sqrt(d1)) * smoothstep(0.28, 0.82, nLow.r * 0.5 + nHigh.g * 0.5);
+        float patch2 = (d2_4 * d2_2 * d2 * sqrt(d2)) * smoothstep(0.30, 0.80, nLow.g * 0.5 + nHigh.b * 0.5);
+        float patch3 = (d3_4 * d3_4 * d3_2) * smoothstep(0.32, 0.78, nLow.b * 0.5 + nHigh.r * 0.5);
+
+        float regionEnv = clamp(brokenStream * 0.50 + patch1 * 0.62 + patch2 * 0.56 + patch3 * 0.52, 0.0, 1.25);
+
+        if (uPass == 1) {
+          gl_FragColor = vec4(regionEnv * 0.625, 0.0, 0.0, 1.0);
+          return;
+        }
+
+        vec3 nebula = vec3(0.0);
+        float starClusterDensity = 0.0;
+
+        if (regionEnv > 0.005) {
+          vec2 uvMicro = (p.xz + p.xy * 0.6) * 3.8 + vec2(nHigh.r, nHigh.g) * 0.45;
+          vec3 nMicro = texture2D(uNoiseTex, uvMicro).rgb;
+
+          float billowCloud = smoothstep(0.30, 0.86, nLow.r * 0.35 + nHigh.g * 0.40 + nMicro.r * 0.25);
+          float wispyPlume  = pow(smoothstep(0.36, 0.90, nHigh.b * 0.55 + nMicro.b * 0.45), 1.45);
+          float darkBay     = smoothstep(0.48, 0.84, nLow.b * 0.55 + nHigh.r * 0.45) * smoothstep(0.42, 0.80, nMicro.g);
+
+          vec3 slateMist    = vec3(0.026, 0.034, 0.046) * billowCloud;
+          vec3 silverPlume  = vec3(0.054, 0.062, 0.074) * wispyPlume;
+          vec3 ivoryNursery = vec3(0.078, 0.070, 0.060) * (patch1 * 0.7 + patch2 * 0.5 + brokenStream * (billowCloud * billowCloud) * 0.5);
+
+          nebula = (slateMist + silverPlume + ivoryNursery) * regionEnv * (1.0 - darkBay * 0.82);
+
+          float fineSand = pow(max(0.0, nMicro.r * nMicro.g * 1.5), 2.6) * wispyPlume;
+          nebula += vec3(0.088, 0.098, 0.115) * fineSand * regionEnv * (1.0 - darkBay * 0.7);
+          starClusterDensity = regionEnv * (0.45 + 0.85 * wispyPlume) * (1.0 - darkBay * 0.75);
+        }
+
+        gl_FragColor = vec4(min(nebula, vec3(0.25)) * 4.0, min(starClusterDensity, 1.0) * 0.625);
+      }
+`,dt=`      attribute vec2 aPosition;
+      void main() {
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+`,mt=`      precision highp float;
+      precision highp int;
+      precision highp sampler2D;
+      precision highp samplerCube;
+
+      uniform vec2 uResolution;
+      uniform float uInvMinDim;
+      uniform float uResSharp;
+      uniform float uTime;
+      uniform vec3 uCamPos;
+      uniform float uCamR0;
+      uniform vec3 uCamForward;
+      uniform vec3 uCamRight;
+      uniform vec3 uCamUp;
+
+      uniform float uGlow;
+      uniform float uDoppler;
+      uniform float uTemp;
+      uniform float uCosmos;
+      uniform float uBloom;
+      uniform float uSpeed;
+      uniform float uTwinkle;
+      uniform float uLegacyShadow;
+      uniform float uPhotonRing;
+
+      uniform vec3 uBloomBasis;
+      uniform vec3 uStarShift1;
+      uniform vec3 uStarShift2;
+      uniform vec3 uStarShift3;
+      uniform vec3 uStarShift4;
+      uniform vec3 uStarShift5;
+
+      uniform sampler2D uNoiseTex;
+      uniform samplerCube uNebulaCube0;
+      uniform samplerCube uNebulaCube1;
+
+      vec3 planckBlackbody(float t) {
+        t = clamp(t, 0.0, 2.1);
+        vec3 deepBronze     = vec3(0.25, 0.065, 0.012);
+        vec3 burnishedGold  = vec3(0.95, 0.56, 0.21);
+        vec3 champagneIvory = vec3(1.00, 0.92, 0.80);
+        vec3 platinumIce    = vec3(0.88, 0.94, 1.00);
+
+        vec3 col = mix(vec3(0.0), deepBronze, smoothstep(0.0, 0.22, t));
+        col = mix(col, burnishedGold, smoothstep(0.18, 0.60, t));
+        col = mix(col, champagneIvory, smoothstep(0.52, 1.05, t));
+        col = mix(col, platinumIce, smoothstep(1.02, 1.85, t));
+        return col * (0.94 + 0.36 * smoothstep(0.35, 1.45, t));
+      }
+
+      vec3 hash33(vec3 c) {
+        c = fract(c * vec3(0.1031, 0.1030, 0.0973));
+        c += dot(c, c.yxz + 33.33);
+        return fract((c.xxy + c.yxx) * c.zyx);
+      }
+
+      vec3 renderPinpointStarLayer(vec3 dir, float scale, float threshold, float brightness, float pixelSharpness, vec3 seedShift) {
+        vec3 p = dir * scale + seedShift;
+        p += hash33(floor(p * 0.25) + vec3(7.13, 5.71, 3.97)) - 0.5;
+        vec3 cell = floor(p);
+
+        float magSeed = hash33(cell + vec3(41.73, 17.29, 91.07)).x;
+        if (magSeed < threshold) return vec3(0.0);
+
+        vec3 rnd = hash33(cell);
+        vec3 local = p - cell - 0.5;
+        vec3 starCenter = (rnd - 0.5) * 0.52;
+        vec3 dVec = local - starCenter;
+        float d2 = dot(dVec, dVec);
+        if (d2 > 0.18) return vec3(0.0);
+
+        float sizeVar = mix(0.70, 1.30, rnd.y);
+        float mag = pow((magSeed - threshold) / (1.0 - threshold), 1.75);
+        vec3 starCol = mix(
+          vec3(1.0, 0.91, 0.80),
+          mix(vec3(0.98, 0.99, 1.0), vec3(0.77, 0.87, 1.0), smoothstep(0.35, 1.0, rnd.z)),
+          smoothstep(0.0, 0.45, rnd.z)
+        );
+
+        float d2Scaled = d2 * (pixelSharpness / sizeVar);
+
+        float cellPx = scale * uInvMinDim;
+        float d2Px = d2 / (cellPx * cellPx);
+        float sharpPx = pixelSharpness * cellPx * cellPx / sizeVar;
+        float sharpCore = min(sharpPx, 4.0);
+        float d2Core = d2Px * sharpCore;
+
+        float twSeed = fract(magSeed * 127.1 + rnd.x * 311.7 + rnd.z * 74.5);
+        float twAmt = (0.10 + 0.15 * twSeed) * (1.0 - 0.4 * mag) * uTwinkle;
+        float twFreq = 0.6 + fract(rnd.y * 54.3 + magSeed * 13.1 + rnd.z * 7.9) * 2.8;
+        float twPhase = fract(magSeed * 91.7 + rnd.y * 27.3 + rnd.x * 11.3) * 6.2832;
+        float twinkle = 1.0 + twAmt * sin(uTime * twFreq + twPhase);
+
+        if (d2Scaled > 90.0 && d2Core > 20.0) return vec3(0.0);
+
+        float h = exp(-0.10 * d2Scaled);
+        float halo = h * 0.06 * (1.0 - smoothstep(0.02, 0.18, d2));
+        // sizeVar 乘在幅度上而非核宽上：多数层的 cellPx < 1（星格远小于像素），
+        // sharpPx 恒 > 4 使核宽被 clamp 成固定值，若只靠核宽表达 sizeVar 会完全失效。
+        // 幅度缩放保持均值 1.0（不改变整体亮度），并让每颗星在亚像素下显出大小差异。
+        float core = exp(-d2Core) * sizeVar * (1.0 - smoothstep(0.10, 0.18, d2));
+
+        return starCol * ((core + halo) * mag * brightness * twinkle);
+      }
+
+      vec3 getNaturalStardustCosmos(vec3 dir) {
+        vec3 col = vec3(0.0006, 0.0009, 0.0016);
+
+        vec4 nebSample = textureCube(uNebulaCube0, dir);
+        float regionEnv = textureCube(uNebulaCube1, dir).r * 1.6;
+
+        col += (nebSample.rgb * 0.25) * uCosmos;
+        float starClusterDensity = nebSample.a * 1.6;
+
+        vec3 stars = vec3(0.0);
+        if (starClusterDensity > 0.02) {
+          stars += renderPinpointStarLayer(dir, 440.0, 0.60, 0.82 * starClusterDensity, 740.0 * uResSharp, uStarShift1);
+          stars += renderPinpointStarLayer(dir, 275.0, 0.69, 1.05 * starClusterDensity, 640.0 * uResSharp, uStarShift2);
+        }
+        stars += renderPinpointStarLayer(dir, 185.0, 0.76, 1.10 * (0.55 + 0.65 * regionEnv), 560.0 * uResSharp, uStarShift3);
+        stars += renderPinpointStarLayer(dir, 105.0, 0.84, 1.65 * (0.70 + 0.45 * regionEnv), 490.0 * uResSharp, uStarShift4);
+        stars += renderPinpointStarLayer(dir, 50.0,  0.91, 2.75, 420.0 * uResSharp, uStarShift5);
+
+        col += stars * (0.35 + 0.65 * uCosmos);
+        return col;
+      }
+
+      // 吸积盘板体几何唯一来源：canReachDiskSlab() 与 main() 均引用此处，勿另写字面量。
+      const float DISK_H = 0.098;
+      const float DISK_R_IN = 2.26;
+      const float DISK_R_OUT = 10.2;
+      const float DISK_R_IN2 = 5.1076;   // DISK_R_IN ^ 2
+      const float DISK_R_OUT2 = 104.04;  // DISK_R_OUT ^ 2
+
+      // =========================================================================
+      // 精确可达性判定：从 pos 出发沿单位方向 dir 的直线射线能否触及吸积盘板体
+      // （rIn ≤ r ≤ rOut 且 |y| ≤ diskH 的任一区域）。
+      // 用 y 区间与 r ≤ rOut / r ≥ rIn 的二次不等式区间求交，替换此前
+      // 按 max(1e-6, |dir.y|) 相除、再配合阈值（如 dot(pSlab, dir) > 0.22）的
+      // 启发式分类：后者在 |dir.y| → 0 的近水平射线上与真实积分结果不一致，
+      // 分类边界投影到屏幕就是那条笔直的暗线。
+      // 本判定的转移只发生在直线真实相切处，那里盘缘发射本已连续趋于零。
+      // 几何取自文件级 DISK_* 常量（rs=1 归一化坐标）。
+      // =========================================================================
+      bool canReachDiskSlab(vec3 pos, vec3 dir) {
+        float tLo, tHi;
+        if (abs(dir.y) < 1e-8) {
+          if (abs(pos.y) > DISK_H) {
+            return false;
+          }
+          tLo = 0.0;
+          tHi = 1e30;
+        } else {
+          float tA = (-DISK_H - pos.y) / dir.y;
+          float tB = ( DISK_H - pos.y) / dir.y;
+          tLo = min(tA, tB);
+          tHi = max(tA, tB);
+          if (tHi < 0.0) {
+            return false;
+          }
+          tLo = max(tLo, 0.0);
+        }
+
+        float pd = dot(pos, dir);
+        float r2 = dot(pos, pos);
+        float disc = pd * pd - (r2 - DISK_R_OUT2);
+        if (disc < 0.0) {
+          return false;
+        }
+        float sq = sqrt(disc);
+        tLo = max(tLo, max(-pd - sq, 0.0));
+        tHi = min(tHi, -pd + sq);
+        if (tHi < tLo) {
+          return false;
+        }
+
+        float discIn = pd * pd - (r2 - DISK_R_IN2);
+        if (discIn < 0.0) {
+          return true;
+        }
+        float sqIn = sqrt(discIn);
+        return (tLo <= -pd - sqIn) || (tHi >= -pd + sqIn);
+      }
+
+      void main() {
+        vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) * uInvMinDim;
+        float invMinDim2 = uInvMinDim * uInvMinDim;
+
+        vec3 pos = uCamPos;
+        vec3 dir0 = normalize(uCamForward + uv.x * uCamRight + uv.y * uCamUp);
+        vec3 dir = dir0;
+
+        const float rs = 1.0;                   // normalized Schwarzschild radius
+        const float rIn = DISK_R_IN;          // accretion disk inner edge (Rs)
+        const float rOut = DISK_R_OUT;        // accretion disk outer edge (Rs)
+        const float rIn2 = DISK_R_IN2;        // rIn ^ 2
+        const float rOut2 = DISK_R_OUT2;      // rOut ^ 2
+        const float invDiskSpan = 1.0 / (rOut - rIn);
+        const float diskH = DISK_H;           // disk half-thickness (Rs)
+        const float invDiskH = 1.0 / DISK_H;
+        const float rBound = 10.75;      // outer bounding sphere radius (Rs)
+        const float rBound2 = 115.5625;  // rBound ^ 2
+
+        float r0 = uCamR0;
+        float rDotD0 = dot(pos, dir0);
+        float cosRayAngle0 = rDotD0 / r0;
+        vec3 pPerp0 = pos - rDotD0 * dir0;
+        float impactParameterSquared = dot(pPerp0, pPerp0);
+        float b = sqrt(impactParameterSquared);
+
+        vec3 ePerp = b > 1e-5 ? (-pPerp0 / b) : vec3(0.0);
+        float b2Safe = max(impactParameterSquared, 1e-4);
+        float denom = (cosRayAngle0 >= 0.0)
+          ? max(1e-4, r0 * r0 * (1.0 + cosRayAngle0))
+          : (b2Safe / (1.0 - cosRayAngle0));
+        float baseWeakTerm = (1.0 - cosRayAngle0) * (2.0 + cosRayAngle0) / denom;
+
+        // =========================================================================
+        // 1. 包围球裁剪与黑洞阴影内部 0 步解析剔除
+        // =========================================================================
+        vec3 accumColor = vec3(0.0);
+        float transmittance = 1.0;
+        bool swallowed = true;
+        bool skipLoop = false;
+
+        if (r0 > rBound) {
+          if (rDotD0 >= 0.0 || impactParameterSquared >= rBound2) {
+            skipLoop = true;
+            swallowed = false;
+          } else {
+            float tEntry = -rDotD0 - sqrt(max(0.0, rBound2 - impactParameterSquared));
+            if (tEntry > 0.0) {
+              vec3 entryPos = pos + dir * tEntry;
+              float rE = length(entryPos);
+              float uE = dot(entryPos, dir) / rE;
+              float oneMinusUE = 1.0 - uE;
+              float deltaThetaEntry = 0.5 * rs * b * (
+                baseWeakTerm - (oneMinusUE * oneMinusUE * (2.0 + uE)) / b2Safe
+              );
+              dir = normalize(cos(deltaThetaEntry) * dir0 + sin(deltaThetaEntry) * ePerp);
+              pos = entryPos;
+            }
+          }
+        }
+
+        bool isCapturedOrbit = (impactParameterSquared < 6.85) && (rDotD0 < 0.0);
+
+        // 黑洞阴影内部在抵达 r < rIn 前若直线路径不可能触碰前景吸积盘薄板，直接 0 步跳过循环
+        if (!skipLoop && isCapturedOrbit && abs(pos.y) > diskH && !canReachDiskSlab(pos, dir)) {
+          skipLoop = true;
+          swallowed = true;
+        }
+
+        float r2 = dot(pos, pos);
+        float r = sqrt(r2);
+
+        // =========================================================================
+        // 2. 光线步进：按三维包络逐步积分密度，盘内采样使用赤道投影缓存
+        // =========================================================================
+        bool crossedDiskFront = false;
+        bool useLegacy = uLegacyShadow > 0.5;
+
+        if (!skipLoop) {
+          float neg15RsH2 = -1.5 * rs * impactParameterSquared;
+          float invR = 1.0 / r;
+          float invR2 = invR * invR;
+          vec3 accel = (neg15RsH2 * (invR2 * invR2 * invR)) * pos;
+
+          float filamentStructure = 0.0;
+
+          for (int i = 0; i < 96; i++) {
+            float rDotD = dot(pos, dir);
+            float absY = abs(pos.y);
+
+            float dirLen2 = dot(dir, dir);
+            float invDirLen = useLegacy ? 1.0 : inversesqrt(max(dirLen2, 1e-12));
+            float dirLen = useLegacy ? 1.0 : (dirLen2 * invDirLen);
+            float absDirY = abs(dir.y);
+
+            if (r < 1.02 || (r < 1.45 && rDotD < 0.0)) {
+              swallowed = true;
+              break;
+            }
+
+            if (isCapturedOrbit) {
+              if (r < rIn || (crossedDiskFront && absY > diskH)) {
+                swallowed = true;
+                break;
+              }
+              if (absY > diskH && !canReachDiskSlab(pos, dir * invDirLen)) {
+                swallowed = true;
+                break;
+              }
+            }
+
+            if (rDotD > 0.0) {
+              if (r > rOut) {
+                swallowed = false;
+                break;
+              }
+              if (r > 2.4 && absY > diskH && pos.y * dir.y > 0.0) {
+                if (absDirY * r2 * r > -0.55 * neg15RsH2 * dirLen ||
+                    absDirY * r2 * r2 > -1.50 * neg15RsH2 * (absY * dirLen + 0.25 * r * absDirY)) {
+                  swallowed = false;
+                  break;
+                }
+              }
+            }
+
+            float dr = max(0.0, r - rs);
+            float fineStep = 0.042 + 0.052 * dr;
+            float vacuumStep = 0.046 + 0.068 * dr + 0.022 * dr * dr;
+            bool inDiskCavity = (!isCapturedOrbit) && (((r < rIn) && (rDotD <= 0.0)) || (r + vacuumStep * dirLen < rIn));
+
+            float stepSize = fineStep;
+            if (inDiskCavity || absY > diskH) {
+              if (!inDiskCavity && pos.y * dir.y < 0.0) {
+                // 分母下限必须远小于真实 |dir.y|（不能取 0.06）：下限大于真实斜率时 distToSlab
+                // 被严重低估，每步只按被压小的"到板距离"推进，近水平射线在 96 步预算内始终爬行、
+                // 到不了板面也出不了场，整条丢光——投影到屏幕就是那条横穿亮带的暗线。
+                float distToSlab = (absY - diskH) / max(1e-6, absDirY * invDirLen);
+                stepSize = min(vacuumStep, max(fineStep * 0.25, distToSlab * 0.92));
+              } else {
+                stepSize = vacuumStep;
+              }
+            }
+
+            vec3 midDir = dir + accel * (0.5 * stepSize);
+            vec3 nextPos = pos + midDir * stepSize;
+            float nextR2 = dot(nextPos, nextPos);
+
+            if (!inDiskCavity && min(pos.y, nextPos.y) < diskH && max(pos.y, nextPos.y) > -diskH) {
+              crossedDiskFront = true;
+              if (max(r2, nextR2) > rIn2) {
+                float dy = nextPos.y - pos.y;
+                float safeDy = abs(dy) > 1e-6 ? dy : (dy >= 0.0 ? 1e-6 : -1e-6);
+                float invDy = 1.0 / safeDy;
+
+                float t0 = (-diskH - pos.y) * invDy;
+                float t1 = ( diskH - pos.y) * invDy;
+                float tEnter = max(0.0, min(t0, t1));
+                float tExit  = min(1.0, max(t0, t1));
+
+                if (tExit > tEnter) {
+                  vec3 midU = midDir * inversesqrt(max(dot(midDir, midDir), 1e-12));
+                  float absMidDirY = abs(midU.y);
+
+                  // 代表点取光线与赤道面 y=0 的交点（并夹到本步弦内），不取穿盘弦中点：
+                  // 掠射时弦在半径方向上延伸极远，中点会落在与赤道交点完全不同的半径上，
+                  // 亮度被记到错误半径，环带会出现一头粗一头细
+                  float tSample = clamp(-pos.y * invDy, tEnter, tExit);
+                  float tauSample = tSample * stepSize;
+                  vec3 samplePos = pos + (dir + accel * (0.5 * tauSample)) * tauSample;
+                  float sampleR2 = dot(samplePos, samplePos);
+
+                  // 与纹理无关的径向/垂直衰减先算：据此可证明本次发射必然被丢弃，从而跳过纹理采样
+                  float invSampleR = inversesqrt(max(sampleR2, 1e-12));
+                  float sampleR = sampleR2 * invSampleR;
+                  float radialNorm = (sampleR - rIn) * invDiskSpan;
+                  float innerEdge = smoothstep(0.0, 0.12, radialNorm);
+                  float outerEdge = pow(max(1.0 - radialNorm, 0.0), 2.45);
+                  float radialFalloff = innerEdge * outerEdge;
+
+                  float ua = clamp((pos.y + dy * tEnter) * invDiskH, -1.0, 1.0);
+                  float ub = clamp((pos.y + dy * tExit) * invDiskH, -1.0, 1.0);
+                  float verticalFalloff = max(0.0, 1.0 - (ua * ua + ua * ub + ub * ub) * 0.333333);
+
+                  float baseEnv = radialFalloff * verticalFalloff;
+                  float innerCorona = exp(-radialNorm * 8.5) * 0.45;
+
+                  // 等价提前退出：filamentStructure = pow(clamp(fRaw,0,1),1.18) ∈ [0,1]，
+                  // 故 0.16 + 0.84*f + innerCorona ≤ 1.45。若 transmittance*baseEnv*1.45 已过不了
+                  // 发射门限 0.0012，则本次无论取到什么纹理都必然跳过发射，纹理采样可省。
+                  bool emitPossible = (transmittance * baseEnv * 1.45) > 0.0012;
+
+                  // 纹理与密度取同一点（samplePos），逐步重采，不做跨步缓存：
+                  // 缓存会让径向亮度剖面沿弦变陈旧；也不再沿视线投影到赤道面求 texPos，
+                  // 投影与 samplePos 可错开最多约 1 Rs，反而使细丝半径与亮度包络不一致。
+                  // 门限下界 rIn2 与 emitPossible 均为等价裁剪——被跳过时 filamentStructure 的旧值
+                  // 不可能被用到（要么密度块不执行，要么发射块必然跳过）。
+                  if (emitPossible && sampleR2 > rIn2 && sampleR2 < rOut2 * 1.06) {
+                    vec3 texPos = samplePos;
+                    float texR2 = clamp(sampleR2, rIn2 * 1.001, rOut2 * 0.999);
+                    float invTexR = inversesqrt(texR2);
+                    float texR = texR2 * invTexR;
+
+                    vec3 dCam = texPos - uCamPos;
+                    float drPixel2 = (dot(dCam, dCam) * invMinDim2) / max(0.0784, absMidDirY * absMidDirY);
+                    float mipBias = clamp(0.5 * log2(max(drPixel2, 1e-6) * 14.44), -0.45, 1.35);
+
+                    float angle = atan(texPos.z, texPos.x);
+                    float omega = 2.35 * pow(invTexR, 1.35);
+                    float spinPeriod = 6.2831853 / max(omega * uSpeed, 1e-4);
+                    float spinTime = mod(uTime, spinPeriod);
+                    float uAngle = (angle + spinTime * omega * uSpeed) * 0.15915494;
+
+                    float logR = log(texR * (1.0 / rIn));
+                    vec2 uvShear1 = vec2(uAngle + logR * 0.58, logR * 1.55 - uTime * 0.015 * uSpeed);
+                    vec2 uvShear2 = vec2(uAngle * 3.0 - logR * 1.10, texR * 0.68 + uTime * 0.024 * uSpeed);
+                    vec2 uvShear3 = vec2(uAngle * 6.0 + logR * 1.85, texR * 1.45 - uTime * 0.032 * uSpeed);
+
+                    vec3 tex1 = texture2D(uNoiseTex, uvShear1, mipBias).rgb;
+                    vec3 tex2 = texture2D(uNoiseTex, uvShear2 + tex1.rg * 0.06, mipBias).rgb;
+                    float tex3 = (transmittance > 0.24)
+                      ? texture2D(uNoiseTex, uvShear3 - tex2.gb * 0.04, mipBias + 0.25).b
+                      : (0.5 * (tex1.g + tex2.r));
+
+                    vec3 w123 = exp(vec3(-40.5, -352.8, -1862.08) * drPixel2);
+                    vec3 sinVec = sin(vec3(
+                      texR * 15.0 + tex1.r * 5.0,
+                      texR * 42.0 + tex2.g * 5.6 + uAngle * 6.28318,
+                      texR * 92.0 + tex3 * 6.2 - uAngle * 12.56637
+                    ));
+
+                    float sharpFilaments = 0.5 + dot(w123 * sinVec, vec3(0.22, 0.17, 0.11));
+                    float magneticThreads = tex1.b * 0.45 + tex2.b * 0.35 + tex3 * 0.20;
+                    float fRaw = clamp(mix(magneticThreads, sharpFilaments, 0.68), 0.0, 1.0);
+                    filamentStructure = pow(fRaw, 1.18);
+                  }
+
+                  if (sampleR2 > rIn2 && sampleR2 < rOut2) {
+                    float density = baseEnv * (0.16 + 0.84 * filamentStructure + innerCorona);
+
+                    if (transmittance * density > 0.0012) {
+                      float invSampleR2 = invSampleR * invSampleR;
+                      float inverseSlantRadius = invSampleR * (1.0 + 0.5 * samplePos.y * samplePos.y * invSampleR2);
+                      float cosTheta = (samplePos.z * midU.x - samplePos.x * midU.z) * inverseSlantRadius;
+                      float orbitalBeta = clamp(sqrt(0.5 * invSampleR), 0.0, 0.66);
+                      float dopplerFactor = max(0.22, 1.0 + uDoppler * orbitalBeta * cosTheta * 1.42);
+                      float gravRedshift = sqrt(max(0.10, 1.0 - invSampleR));
+
+                      float localTemp = (1.04 - 0.62 * pow(radialNorm, 0.72) + 0.26 * filamentStructure) * dopplerFactor * gravRedshift * uTemp;
+                      vec3 emitCol = planckBlackbody(localTemp);
+
+                      float slabPath = min((tExit - tEnter) * stepSize * dirLen, diskH * 3.6);
+                      float intensity = density * pow(dopplerFactor, 2.55) * gravRedshift * uGlow * 5.8;
+                      float alpha = clamp(density * slabPath * 6.8, 0.0, 1.0);
+
+                      accumColor += transmittance * emitCol * (intensity * slabPath);
+                      transmittance *= (1.0 - alpha * 0.78);
+
+                      if (transmittance < 0.010) {
+                        swallowed = true;
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (isCapturedOrbit && crossedDiskFront && abs(nextPos.y) > diskH && (nextPos.y - pos.y) * nextPos.y > 0.0) {
+                swallowed = true;
+                break;
+              }
+            }
+
+            float nextInvR = inversesqrt(nextR2);
+            float nextR = nextR2 * nextInvR;
+            float nextInvR2 = nextInvR * nextInvR;
+            vec3 nextAccel = (neg15RsH2 * (nextInvR2 * nextInvR2 * nextInvR)) * nextPos;
+            dir = dir + 0.5 * (accel + nextAccel) * stepSize;
+            if (useLegacy) dir *= inversesqrt(max(dot(dir, dir), 1e-12));
+
+            pos = nextPos;
+            r2 = nextR2;
+            r = nextR;
+            accel = nextAccel;
+          }
+        }
+
+        // =========================================================================
+        // 3. 延迟计算引力透镜偏折角、光子环与深空星域合成
+        // =========================================================================
+        const float bCrit = 2.598076;    // critical impact parameter = 3*sqrt(3)/2 * Rs
+
+        // 光子环：由撞击参数 b 直接驱动，峰值压在 bCrit 上。
+        // 不能走 minR —— 那条追踪被 6.85 阴影遮罩掐死，minR 恒停在初始值，环会恒为 0。
+        bool ringOn = uPhotonRing > 0.5;
+        const float bShadow = 2.617314;  // sqrt(6.85)，6.85 遮罩给出的阴影边界
+        float bandRing = exp(-max(0.0, b - bCrit) * 110.0);
+
+        if (!swallowed) {
+          float bSafe = max(b, 0.6 * rs);
+          float thetaWeak = 0.5 * rs * b * baseWeakTerm * (1.0 + (15.0 * 3.14159265 * rs) / (32.0 * bSafe));
+
+          // 强场偏折拟合：对精确 geodesic 积分结果做最小二乘拟合（b∈[2.8,13] 残差<0.08 rad，
+          // 原经验式在此区间过冲 0.05~0.62 rad）。T 项在 b→bCrit 处对数发散，指数尾项在远场快速衰减。
+          float inWeight = 1.0 - smoothstep(-0.25, 0.15, cosRayAngle0);
+          float logArg = max(1.0 - bCrit / bSafe, 0.02);
+          float strongTail = exp(-max(0.0, bSafe - bCrit) * 2.0);
+          float T = -log(logArg) * strongTail;
+          float thetaStrong = inWeight * (
+            0.22453 * T
+            + 7.77209 * strongTail / (bSafe * bSafe)
+            + 1.57784 / (bSafe * bSafe)
+          );
+          float totalTheta = thetaWeak + thetaStrong;
+          vec3 skyDir = normalize(cos(totalTheta) * dir0 + sin(totalTheta) * ePerp);
+
+          if (ringOn) {
+            float softHalo = exp(-max(0.0, b - bCrit) * 10.0) * 0.14;
+            vec3 ringColor = mix(vec3(1.0, 0.82, 0.56), vec3(1.0, 0.96, 0.90), bandRing);
+            accumColor += transmittance * ringColor * (bandRing * 0.95 + softHalo) * uGlow;
+          }
+
+          accumColor += transmittance * getNaturalStardustCosmos(skyDir);
+        } else if (ringOn && b > bCrit && b < bShadow && transmittance > 0.010) {
+          // 被 6.85 遮罩吞掉的临界带：只吐环辉光，盖住此处堆积的压缩星像
+          accumColor += transmittance * mix(vec3(1.0, 0.82, 0.56), vec3(1.0, 0.96, 0.90), bandRing) * bandRing * 0.9 * uGlow;
+        }
+
+        // =========================================================================
+        // 4. 360° 屏幕空间镜头微晕：变形方向基由 CPU 按相机滚转投影预计算
+        // =========================================================================
+        if (uBloom > 0.001) {
+          vec2 diskNorm2D = uBloomBasis.xy;
+          vec2 diskAxis2D = vec2(-diskNorm2D.y, diskNorm2D.x);
+          vec2 scaledUV = uv * uBloomBasis.z;
+          float uAlong = dot(scaledUV, diskAxis2D);
+          float uPerp  = dot(scaledUV, diskNorm2D);
+
+          float anamorphicStreak = exp(-abs(uPerp) * 17.5 - abs(uAlong) * 2.6);
+          float softVeil = exp(-dot(scaledUV, scaledUV) * 4.8) * 0.025;
+          accumColor += vec3(1.0, 0.86, 0.68) * (anamorphicStreak * 0.040 + softVeil) * uGlow * uBloom;
+        }
+
+        // ACES 近似色调映射与 Gamma 校正
+        accumColor = (accumColor * (2.51 * accumColor + 0.03)) / (accumColor * (2.43 * accumColor + 0.59) + 0.14);
+        accumColor = pow(clamp(accumColor, 0.0, 1.0), vec3(0.454545));
+
+        // 三角分布抖动打散色带
+        float d1 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+        float d2 = fract(52.9829189 * fract(dot(gl_FragCoord.xy + vec2(17.0, 31.0), vec2(0.06711056, 0.00583715))));
+        accumColor += (d1 - d2) * (1.0 / 255.0);
+
+        gl_FragColor = vec4(accumColor, 1.0);
+      }
+`,C=He(t,ct,ut,"bake"),s=He(t,dt,mt,"main"),ft=new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),Oe=t.createBuffer();t.bindBuffer(t.ARRAY_BUFFER,Oe);t.bufferData(t.ARRAY_BUFFER,ft,t.STATIC_DRAW);const Ne=lt(t,512),xe=512,Ee=256;function ze(e){const o=t.getExtension("OES_texture_half_float"),a=t.getExtension("OES_texture_half_float_linear"),r=t.createFramebuffer();t.bindFramebuffer(t.FRAMEBUFFER,r);function i(m){const f=t.createTexture();t.bindTexture(t.TEXTURE_CUBE_MAP,f),t.texParameteri(t.TEXTURE_CUBE_MAP,t.TEXTURE_WRAP_S,t.CLAMP_TO_EDGE),t.texParameteri(t.TEXTURE_CUBE_MAP,t.TEXTURE_WRAP_T,t.CLAMP_TO_EDGE),t.texParameteri(t.TEXTURE_CUBE_MAP,t.TEXTURE_MIN_FILTER,t.LINEAR),t.texParameteri(t.TEXTURE_CUBE_MAP,t.TEXTURE_MAG_FILTER,t.LINEAR);for(let h=0;h<6;h++)t.texImage2D(t.TEXTURE_CUBE_MAP_POSITIVE_X+h,0,t.RGBA,e,e,0,t.RGBA,m,null);return t.framebufferTexture2D(t.FRAMEBUFFER,t.COLOR_ATTACHMENT0,t.TEXTURE_CUBE_MAP_POSITIVE_X,f,0),t.checkFramebufferStatus(t.FRAMEBUFFER)===t.FRAMEBUFFER_COMPLETE?f:(t.deleteTexture(f),null)}let u=null;return o&&a&&(u=i(o.HALF_FLOAT_OES)),u||(u=i(t.UNSIGNED_BYTE)),t.bindFramebuffer(t.FRAMEBUFFER,null),{tex:u,fbo:r}}const we=ze(xe),ye=ze(Ee),w={aPosition:t.getAttribLocation(C,"aPosition"),uFace:t.getUniformLocation(C,"uFace"),uPass:t.getUniformLocation(C,"uPass"),uGalUp:t.getUniformLocation(C,"uGalUp"),uGalRight:t.getUniformLocation(C,"uGalRight"),uGalForward:t.getUniformLocation(C,"uGalForward"),uCloudDir1:t.getUniformLocation(C,"uCloudDir1"),uCloudDir2:t.getUniformLocation(C,"uCloudDir2"),uCloudDir3:t.getUniformLocation(C,"uCloudDir3"),uCosmosSeed:t.getUniformLocation(C,"uCosmosSeed"),uNoiseTex:t.getUniformLocation(C,"uNoiseTex")};t.useProgram(s);const Xe=t.getAttribLocation(s,"aPosition");t.enableVertexAttribArray(Xe);t.vertexAttribPointer(Xe,2,t.FLOAT,!1,0,0);const l={uResolution:t.getUniformLocation(s,"uResolution"),uInvMinDim:t.getUniformLocation(s,"uInvMinDim"),uResSharp:t.getUniformLocation(s,"uResSharp"),uTime:t.getUniformLocation(s,"uTime"),uCamPos:t.getUniformLocation(s,"uCamPos"),uCamR0:t.getUniformLocation(s,"uCamR0"),uCamForward:t.getUniformLocation(s,"uCamForward"),uCamRight:t.getUniformLocation(s,"uCamRight"),uCamUp:t.getUniformLocation(s,"uCamUp"),uGlow:t.getUniformLocation(s,"uGlow"),uDoppler:t.getUniformLocation(s,"uDoppler"),uTemp:t.getUniformLocation(s,"uTemp"),uCosmos:t.getUniformLocation(s,"uCosmos"),uBloom:t.getUniformLocation(s,"uBloom"),uSpeed:t.getUniformLocation(s,"uSpeed"),uTwinkle:t.getUniformLocation(s,"uTwinkle"),uLegacyShadow:t.getUniformLocation(s,"uLegacyShadow"),uPhotonRing:t.getUniformLocation(s,"uPhotonRing"),uBloomBasis:t.getUniformLocation(s,"uBloomBasis"),uStarShift1:t.getUniformLocation(s,"uStarShift1"),uStarShift2:t.getUniformLocation(s,"uStarShift2"),uStarShift3:t.getUniformLocation(s,"uStarShift3"),uStarShift4:t.getUniformLocation(s,"uStarShift4"),uStarShift5:t.getUniformLocation(s,"uStarShift5"),uNoiseTex:t.getUniformLocation(s,"uNoiseTex"),uNebulaCube0:t.getUniformLocation(s,"uNebulaCube0"),uNebulaCube1:t.getUniformLocation(s,"uNebulaCube1")};t.activeTexture(t.TEXTURE0);t.bindTexture(t.TEXTURE_2D,Ne);t.uniform1i(l.uNoiseTex,0);t.activeTexture(t.TEXTURE1);t.bindTexture(t.TEXTURE_CUBE_MAP,we.tex);t.uniform1i(l.uNebulaCube0,1);t.activeTexture(t.TEXTURE2);t.bindTexture(t.TEXTURE_CUBE_MAP,ye.tex);t.uniform1i(l.uNebulaCube1,2);const I=new Float32Array(3),qe=new Float32Array(3),Ge=new Float32Array(3),Ye=new Float32Array(3),Ve=new Float32Array(3),We=new Float32Array(3),ie=new Float32Array(4),te=new Float32Array(3);function pt(e,o,a,r){const i=Math.hypot(o,a,r)||1;e[0]=o/i,e[1]=a/i,e[2]=r/i}function ht(e,o,a){e[0]=o[1]*a[2]-o[2]*a[1],e[1]=o[2]*a[0]-o[0]*a[2],e[2]=o[0]*a[1]-o[1]*a[0]}function ne(e){const o=Math.random()*2-1,a=Math.random()*Math.PI*2,r=Math.sqrt(Math.max(0,1-o*o));e[0]=r*Math.cos(a),e[1]=o,e[2]=r*Math.sin(a)}function gt(){t.useProgram(C),t.bindBuffer(t.ARRAY_BUFFER,Oe),t.enableVertexAttribArray(w.aPosition),t.vertexAttribPointer(w.aPosition,2,t.FLOAT,!1,0,0),t.activeTexture(t.TEXTURE0),t.bindTexture(t.TEXTURE_2D,Ne),t.uniform1i(w.uNoiseTex,0),t.uniform3fv(w.uGalUp,I),t.uniform3fv(w.uGalRight,qe),t.uniform3fv(w.uGalForward,Ge),t.uniform3fv(w.uCloudDir1,Ye),t.uniform3fv(w.uCloudDir2,Ve),t.uniform3fv(w.uCloudDir3,We),t.uniform4fv(w.uCosmosSeed,ie),t.bindFramebuffer(t.FRAMEBUFFER,we.fbo),t.viewport(0,0,xe,xe),t.uniform1i(w.uPass,0);for(let e=0;e<6;e++)t.framebufferTexture2D(t.FRAMEBUFFER,t.COLOR_ATTACHMENT0,t.TEXTURE_CUBE_MAP_POSITIVE_X+e,we.tex,0),t.uniform1i(w.uFace,e),t.drawArrays(t.TRIANGLES,0,6);t.bindFramebuffer(t.FRAMEBUFFER,ye.fbo),t.viewport(0,0,Ee,Ee),t.uniform1i(w.uPass,1);for(let e=0;e<6;e++)t.framebufferTexture2D(t.FRAMEBUFFER,t.COLOR_ATTACHMENT0,t.TEXTURE_CUBE_MAP_POSITIVE_X+e,ye.tex,0),t.uniform1i(w.uFace,e),t.drawArrays(t.TRIANGLES,0,6);t.bindFramebuffer(t.FRAMEBUFFER,null),d.width>0&&d.height>0&&t.viewport(0,0,d.width,d.height),t.useProgram(s)}function Ze(){ne(I);const e=Math.abs(I[1])<.85?0:1,o=Math.abs(I[1])<.85?1:0,a=[o*I[2],-e*I[2],e*I[1]-o*I[0]];pt(a,a[0],a[1],a[2]);const r=[0,0,0];ht(r,I,a);const i=Math.random()*Math.PI*2,u=Math.cos(i),m=Math.sin(i);for(let p=0;p<3;p++)qe[p]=u*a[p]+m*r[p],Ge[p]=-m*a[p]+u*r[p];ne(Ye),ne(Ve),ne(We);for(let p=0;p<4;p++)ie[p]=Math.random()*100;for(let p=0;p<3;p++)te[p]=(Math.random()-.5)*400;gt();const f=te[0],c=te[1],h=te[2];t.uniform3f(l.uStarShift1,f*1.73,c*1.73,h*1.73),t.uniform3f(l.uStarShift2,f*1.31,c*1.31,h*1.31),t.uniform3f(l.uStarShift3,f,c,h),t.uniform3f(l.uStarShift4,f*.67,c*.67,h*.67),t.uniform3f(l.uStarShift5,f*.37,c*.37,h*.37);const v=Math.floor((ie[0]*4096+ie[1]*256)%65535).toString(16).toUpperCase().padStart(4,"0"),T=document.getElementById("tel-seed");T&&(T.textContent=`#${v}`)}const Ke=13.2,X=Math.PI*2,Me=.0055,vt=.0012,St=.065;function Be(e,o){let a=(o-e)%X;return a>Math.PI&&(a-=X),a<-Math.PI&&(a+=X),a}function ue(e){let o=e%X;return o>Math.PI&&(o-=X),o<-Math.PI&&(o+=X),o}const n={yaw:.42,pitch:.142,rollDeg:-10,zoomScale:1,targetYaw:.42,targetPitch:.142,targetRollDeg:-10,targetZoomScale:1,autoRotate:!0,autoDRS:!0,renderScale:1.2,glow:1.22,doppler:1,temp:1,cosmos:1.05,bloom:.8,speed:1,twinkle:1,legacyShadow:!1,photonRing:!1,uniformsDirty:!0};function $e(){n.uniformsDirty&&(t.uniform1f(l.uGlow,n.glow),t.uniform1f(l.uDoppler,n.doppler),t.uniform1f(l.uTemp,n.temp),t.uniform1f(l.uCosmos,n.cosmos),t.uniform1f(l.uBloom,n.bloom),t.uniform1f(l.uSpeed,n.speed),t.uniform1f(l.uTwinkle,n.twinkle),t.uniform1f(l.uLegacyShadow,n.legacyShadow?1:0),t.uniform1f(l.uPhotonRing,n.photonRing?1:0),n.uniformsDirty=!1)}const oe=new Float32Array(3),ae=new Float32Array(3),O=new Float32Array(3),N=new Float32Array(3),re=new Float32Array(3),bt=document.getElementById("tel-res");function K(){const e=Math.max(1,d.clientWidth||window.innerWidth),o=Math.max(1,d.clientHeight||window.innerHeight),a=Math.min(window.devicePixelRatio||1,1.5),r=280/Math.min(e,o),i=Math.max(r,a*n.renderScale),u=Math.round(e*i),m=Math.round(o*i);if(d.width!==u||d.height!==m){d.width=u,d.height=m,t.viewport(0,0,d.width,d.height);const f=Math.min(d.width,d.height),c=f/850,h=Math.min(30,Math.max(.15,c*c));t.uniform2f(l.uResolution,d.width,d.height),t.uniform1f(l.uInvMinDim,1/f),t.uniform1f(l.uResSharp,h),bt.textContent=`${d.width}×${d.height} (${n.renderScale.toFixed(2)}x)`}}const Rt=document.getElementById("slider-zoom"),xt=document.getElementById("val-zoom");function $(e){n.targetZoomScale=Math.max(.1,Math.min(2.5,e)),Rt.value=n.targetZoomScale.toFixed(2),xt.textContent=n.targetZoomScale.toFixed(2)+"x"}function je(e,o,a){n.yaw=ue(n.yaw),n.pitch=ue(n.pitch),n.targetYaw=n.yaw+Be(n.yaw,e),n.targetPitch=n.pitch+Be(n.pitch,o),n.targetRollDeg=a}let P=!1,B=0,k=0;function Je(e,o){const a=n.rollDeg*Math.PI/180,r=Math.cos(a),i=Math.sin(a),u=r*e+i*o,m=-i*e+r*o,f=Math.cos(n.targetPitch)>=0?1:-1;n.targetYaw-=u*Me*f,n.targetPitch+=m*Me,H()}d.addEventListener("mousedown",e=>{P=!0,B=e.clientX,k=e.clientY});window.addEventListener("mousemove",e=>{if(!P)return;const o=e.clientX-B,a=e.clientY-k;B=e.clientX,k=e.clientY,Je(o,a)});window.addEventListener("mouseup",()=>{P=!1});d.addEventListener("wheel",e=>{e.preventDefault();const o=Math.exp(-e.deltaY*vt);$(n.targetZoomScale*o),H()},{passive:!1});let q=0;d.addEventListener("touchstart",e=>{e.preventDefault(),e.touches.length===1?(P=!0,B=e.touches[0].clientX,k=e.touches[0].clientY):e.touches.length>=2&&(P=!1,q=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY))},{passive:!1});d.addEventListener("touchmove",e=>{if(e.preventDefault(),P&&e.touches.length===1){const o=e.touches[0].clientX-B,a=e.touches[0].clientY-k;B=e.touches[0].clientX,k=e.touches[0].clientY,Je(o,a)}else if(e.touches.length>=2){const o=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);q>0&&($(n.targetZoomScale*(o/q)),H()),q=o}},{passive:!1});d.addEventListener("touchend",e=>{e.touches.length===0?(P=!1,q=0):e.touches.length===1&&(q=0,P=!0,B=e.touches[0].clientX,k=e.touches[0].clientY)},{passive:!1});window.addEventListener("gesturestart",e=>e.preventDefault(),{passive:!1});window.addEventListener("gesturechange",e=>e.preventDefault(),{passive:!1});window.addEventListener("gestureend",e=>e.preventDefault(),{passive:!1});const Pe=document.querySelectorAll(".preset-btn");function H(){Pe.forEach(e=>e.classList.remove("active"))}Pe.forEach(e=>{e.addEventListener("click",()=>{H(),e.classList.add("active");const o=ue(n.yaw);je(o,parseFloat(e.dataset.pitch),parseFloat(e.dataset.roll)),$(parseFloat(e.dataset.scale)),document.getElementById("slider-roll").value=n.targetRollDeg,document.getElementById("val-roll").textContent=`${Math.round(n.targetRollDeg)}°`})});const x={zh:{langBtn:"EN",headerTitle:"Gargantua // 卡冈都亚",controlsTitle:"时空光学控制",telFps:"实时帧率",telDist:"视界距离",telRsh:"光子环Rc",telInc:"轨道姿态",telRes:"渲染缓冲",telSeed:"星域序列",preset1:"经典卡冈都亚",preset2:"掠射赤道 88°",preset3:"极轴俯瞰 90°",lblZoom:"视界尺度",lblGlow:"吸积盘光度",lblDoppler:"多普勒集束",lblTemp:"黑体色温",lblCosmos:"星尘丰度",lblTwinkle:"星光闪烁",lblBloom:"镜头眩光",lblSpeed:"轨道角速",lblRoll:"镜头倾角",lblScale:"超采样率",drsOn:"自适应满帧: 开",drsOff:"自适应满帧: 关",cruiseOn:"轨道巡航: 开",cruiseOff:"轨道巡航: 关",legacyShadow:"旧版黑洞",photonRing:"光子环",randomCosmos:"随机星域",resetAll:"全部重置",hideHud:"隐藏界面 (H)",showHud:"显示界面 (H)",hideHudShort:"隐藏",showHudShort:"显示",btnLandscape:"横屏",btnPortrait:"竖屏"},en:{langBtn:"FR",headerTitle:"Gargantua // Deep Space Optics",controlsTitle:"Spacetime Optics",telFps:"Frame Rate",telDist:"Horizon Distance",telRsh:"Photon Ring Rc",telInc:"Orbit Attitude",telRes:"Render Buffer",telSeed:"Cosmos Seed",preset1:"Classic",preset2:"Equator 88°",preset3:"Polar 90°",lblZoom:"Horizon Scale",lblGlow:"Disk Luminosity",lblDoppler:"Doppler Beaming",lblTemp:"Planck Temp",lblCosmos:"Stardust Density",lblTwinkle:"Star Twinkle",lblBloom:"Lens Bloom",lblSpeed:"Orbital Spin",lblRoll:"Camera Roll",lblScale:"Render Scale",drsOn:"DRS: ON",drsOff:"DRS: OFF",cruiseOn:"Cruise: ON",cruiseOff:"Cruise: OFF",legacyShadow:"Legacy Shadow",photonRing:"Photon Ring",randomCosmos:"Random Cosmos",resetAll:"Reset All",hideHud:"Hide HUD (H)",showHud:"Show HUD (H)",hideHudShort:"Hide",showHudShort:"Show",btnLandscape:"Rotate",btnPortrait:"Portrait"},fr:{langBtn:"LA",headerTitle:"Gargantua // Optique Spatiale",controlsTitle:"Optique Spatiale",telFps:"Images / s",telDist:"Distance Horizon",telRsh:"Anneau Photon Rc",telInc:"Attitude Orbitale",telRes:"Tampon de Rendu",telSeed:"Graine Cosmique",preset1:"Classique",preset2:"Équateur 88°",preset3:"Polaire 90°",lblZoom:"Échelle d’Horizon",lblGlow:"Luminosité Disque",lblDoppler:"Faisceau Doppler",lblTemp:"Temp. de Planck",lblCosmos:"Densité Poussière",lblTwinkle:"Scintillement",lblBloom:"Éclat Optique",lblSpeed:"Vitesse Orbitale",lblRoll:"Roulis Caméra",lblScale:"Suréchantillonnage",drsOn:"DRS: ACTIF",drsOff:"DRS: INACTIF",cruiseOn:"Croisière: ON",cruiseOff:"Croisière: OFF",legacyShadow:"Ombre Rétro",photonRing:"Anneau Photon",randomCosmos:"Cosmos Aléat.",resetAll:"Rétablir",hideHud:"Masquer HUD (H)",showHud:"Afficher HUD (H)",hideHudShort:"Masquer",showHudShort:"Afficher",btnLandscape:"Paysage",btnPortrait:"Portrait"},la:{langBtn:"中文",headerTitle:"Gargantua // Optica Relativistica",controlsTitle:"Optica Spatiotemporis",telFps:"Frequentia FPS",telDist:"Distantia Horizontis",telRsh:"Anulus Photonum Rc",telInc:"Habitus Orbitae",telRes:"Memoria Reditionis",telSeed:"Semen Cosmici",preset1:"Classicus",preset2:"Aequator 88°",preset3:"Polaris 90°",lblZoom:"Magnitudo Horizontis",lblGlow:"Luminositas Disci",lblDoppler:"Fasciculus Doppler",lblTemp:"Temp. Planckiana",lblCosmos:"Densitas Stellaris",lblTwinkle:"Scintillatio",lblBloom:"Effulgentia Lentis",lblSpeed:"Velocitas Orbitae",lblRoll:"Inclinatio Camerae",lblScale:"Gradus Reditionis",drsOn:"DRS: ACTUM",drsOff:"DRS: CLAUSUM",cruiseOn:"Cursus: ON",cruiseOff:"Cursus: OFF",legacyShadow:"Umbra Vetus",photonRing:"Anulus Photonum",randomCosmos:"Cosmos Novus",resetAll:"Restituere",hideHud:"Occultare HUD (H)",showHud:"Monstrare HUD (H)",hideHudShort:"Occultare",showHudShort:"Monstrare",btnLandscape:"In Latus",btnPortrait:"Rectum"}},se=["zh","en","fr","la"];let g="zh";try{const e=localStorage.getItem("gargantua_lang");se.includes(e)&&(g=e)}catch{}const Qe=[];function Et(e){Qe.push(e)}function wt(){for(const e of Qe)e()}function et(e){if(!x[e])return;g=e;const o={zh:"zh-CN",en:"en",fr:"fr",la:"la"};document.documentElement.lang=o[e]||e,document.querySelectorAll("[data-i18n]").forEach(a=>{const r=a.getAttribute("data-i18n");x[g]&&x[g][r]&&(a.textContent=x[g][r])}),wt();try{localStorage.setItem("gargantua_lang",g)}catch{}}function tt(){const e=se.indexOf(g),o=se[(e+1)%se.length];et(o)}const ve=document.getElementById("tel-fps"),yt=document.getElementById("tel-dist"),Tt=document.getElementById("tel-rsh"),Dt=document.getElementById("tel-inc");function fe(){const e=Ke/n.zoomScale;yt.textContent=`${n.zoomScale.toFixed(2)}x (${e.toFixed(1)} Rs)`,Tt.textContent=`${(2.598*n.zoomScale).toFixed(2)} Rs`;const o=((n.pitch*180/Math.PI+180)%360+360)%360-180,a=(n.yaw*180/Math.PI%360+360)%360,r=o>=0?"+":"";Dt.textContent=`${r}${o.toFixed(1)}° / ${Math.round(a)}°`}const le=document.getElementById("btn-toggle-hud"),W=document.getElementById("btn-landscape"),Z=document.getElementById("btn-drs"),de=document.getElementById("btn-autorotate"),me=document.getElementById("btn-lang");function pe(){Z.textContent=n.autoDRS?x[g].drsOn:x[g].drsOff}function Le(){de.textContent=n.autoRotate?x[g].cruiseOn:x[g].cruiseOff}function nt(){const e=document.body.classList.contains("hud-hidden"),o=e?x[g].showHud:x[g].hideHud,a=e?x[g].showHudShort:x[g].hideHudShort,r=le.querySelector(".hud-text-full"),i=le.querySelector(".hud-text-short");r&&i?(r.textContent=o,i.textContent=a):le.textContent=o}function j(){if(!W)return;const e=window.innerWidth>window.innerHeight,o=!!(document.fullscreenElement||document.webkitFullscreenElement),a=e||o;W.textContent=a?x[g].btnPortrait:x[g].btnLandscape,W.title=a?g==="zh"?"切换至竖屏":"Switch to Portrait":g==="zh"?"切换至横屏":"Switch to Landscape"}async function Ct(){const e=window.innerWidth>window.innerHeight,o=!!(document.fullscreenElement||document.webkitFullscreenElement);if(!e||!o){try{const a=document.documentElement,r=a.requestFullscreen||a.webkitRequestFullscreen||a.mozRequestFullScreen||a.msRequestFullscreen;r&&!o&&await r.call(a),document.body.classList.add("fullscreen-landscape")}catch{}try{screen.orientation&&screen.orientation.lock&&await screen.orientation.lock("landscape")}catch{}}else{document.body.classList.remove("fullscreen-landscape");try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch{}try{const a=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen;a&&o&&await a.call(document)}catch{}}setTimeout(j,150)}function ot(){document.body.classList.toggle("hud-hidden"),nt()}le.addEventListener("click",ot);W&&W.addEventListener("click",Ct);function at(){!document.fullscreenElement&&!document.webkitFullscreenElement&&document.body.classList.remove("fullscreen-landscape"),j()}document.addEventListener("fullscreenchange",at);document.addEventListener("webkitfullscreenchange",at);window.screen&&window.screen.orientation&&window.screen.orientation.addEventListener("change",j);window.addEventListener("resize",j);me&&me.addEventListener("click",tt);window.addEventListener("keydown",e=>{e.target&&(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")||((e.key==="h"||e.key==="H")&&ot(),(e.key==="l"||e.key==="L")&&tt())});document.getElementById("slider-scale");document.getElementById("val-scale");const ke=document.getElementById("slider-zoom");ke.addEventListener("input",()=>{$(parseFloat(ke.value)),H()});const Te=document.getElementById("slider-roll"),rt=document.getElementById("val-roll");Te.addEventListener("input",()=>{n.targetRollDeg=parseFloat(Te.value),rt.textContent=`${Math.round(n.targetRollDeg)}°`,H()});function F(e,o,a,r=""){const i=document.getElementById(e),u=document.getElementById(o);i.addEventListener("input",()=>{n[a]=parseFloat(i.value),u.textContent=n[a].toFixed(2)+r,a==="renderScale"?(n.autoDRS=!1,Z.classList.remove("active"),pe(),K()):n.uniformsDirty=!0,fe()})}F("slider-glow","val-glow","glow");F("slider-doppler","val-doppler","doppler");F("slider-temp","val-temp","temp");F("slider-cosmos","val-cosmos","cosmos");F("slider-bloom","val-bloom","bloom");F("slider-speed","val-speed","speed");F("slider-twinkle","val-twinkle","twinkle");F("slider-scale","val-scale","renderScale","x");Z.addEventListener("click",()=>{n.autoDRS=!n.autoDRS,Z.classList.toggle("active",n.autoDRS),pe()});de.addEventListener("click",()=>{n.autoRotate=!n.autoRotate,de.classList.toggle("active",n.autoRotate),Le()});const he=document.getElementById("btn-legacy-shadow"),ge=document.getElementById("btn-photonring-toggle");function Pt(e){n.legacyShadow=e,e&&n.photonRing&&(n.photonRing=!1,ge.classList.remove("active")),n.uniformsDirty=!0,he.classList.toggle("active",n.legacyShadow)}function Lt(e){n.photonRing=e,e&&n.legacyShadow&&(n.legacyShadow=!1,he.classList.remove("active")),n.uniformsDirty=!0,ge.classList.toggle("active",n.photonRing)}he.addEventListener("click",()=>{Pt(!n.legacyShadow)});ge.addEventListener("click",()=>{Lt(!n.photonRing)});document.getElementById("btn-random-cosmos").addEventListener("click",()=>{Ze()});document.getElementById("btn-reset").addEventListener("click",()=>{je(.42,.142,-10),$(1),n.glow=1.22,n.doppler=1,n.temp=1,n.cosmos=1.05,n.bloom=.8,n.speed=1,n.twinkle=1,n.renderScale=1.2,n.autoDRS=!0,n.autoRotate=!0,n.legacyShadow=!1,n.photonRing=!1,n.uniformsDirty=!0,he.classList.remove("active"),ge.classList.remove("active"),Te.value=-10,rt.textContent="-10°",Z.classList.add("active"),de.classList.add("active"),pe(),Le(),H(),Pe[0].classList.add("active");const e=[["slider-glow","val-glow",1.22,""],["slider-doppler","val-doppler",1,""],["slider-temp","val-temp",1,""],["slider-cosmos","val-cosmos",1.05,""],["slider-bloom","val-bloom",.8,""],["slider-speed","val-speed",1,""],["slider-twinkle","val-twinkle",1,""],["slider-scale","val-scale",1.2,"x"]];for(const[o,a,r,i]of e)document.getElementById(o).value=r,document.getElementById(a).textContent=r.toFixed(2)+i;K(),fe()});Et(()=>{pe(),Le(),nt(),j(),me&&(me.textContent=x[g].langBtn),Y()});const R=document.querySelector(".controls");function Y(){if(!R)return;const e=R.scrollHeight-R.clientHeight>4,o=R.scrollTop<4,a=R.scrollHeight-R.scrollTop-R.clientHeight<4;R.classList.toggle("show-fade",e&&!a),R.classList.toggle("show-fade-top",e&&!o)}R&&(R.addEventListener("scroll",Y,{passive:!0}),window.addEventListener("resize",Y),R.addEventListener("pointerdown",()=>R.classList.add("pressing")),window.addEventListener("pointerup",()=>R.classList.remove("pressing")),window.addEventListener("pointercancel",()=>R.classList.remove("pressing")),requestAnimationFrame(Y),setTimeout(Y,300));const It=document.getElementById("slider-scale"),At=document.getElementById("val-scale"),Se=document.getElementById("fps-mini");Ze();window.addEventListener("resize",K);K();$e();let be=0,De=performance.now(),V=0,z=0,ce=0,Ce=!0,Re=null;function Ie(){Re!==null&&cancelAnimationFrame(Re),Re=requestAnimationFrame(_t)}document.addEventListener("visibilitychange",()=>{Ce=!document.hidden,Ce&&(De=performance.now(),V=0,z=0,ce=0,Ie())});function _t(e){if(!Ce)return;const o=Math.min(.1,(e-De)*.001);if(De=e,be=(be+o)%36e3,V++,z+=o,ce+=o,z>=.5){const S=Math.round(V/z),_=(z/V*1e3).toFixed(1);if(ve.textContent=`${S} FPS (${_} ms)`,ve.style.color=S>=52?"#68d8a6":S>=32?"#e5c89b":"#ff6b6b",Se&&(Se.textContent=`${S}`,Se.style.color=ve.style.color),n.autoDRS){let y=n.renderScale;S<54&&n.renderScale>.6?y=Math.max(.6,n.renderScale-.06):S>=58&&n.renderScale<1.3&&(y=Math.min(1.3,n.renderScale+.05)),Math.abs(y-n.renderScale)>.01&&(n.renderScale=y,It.value=y.toFixed(2),At.textContent=y.toFixed(2)+"x",K())}V=0,z=0}if(n.autoRotate&&!P){const S=Math.cos(n.targetPitch)>=0?1:-1;n.targetYaw+=St*o*S}const a=1-Math.exp(-9.5*o);n.yaw+=(n.targetYaw-n.yaw)*a,n.pitch+=(n.targetPitch-n.pitch)*a,n.rollDeg+=(n.targetRollDeg-n.rollDeg)*a,n.zoomScale+=(n.targetZoomScale-n.zoomScale)*a,!P&&Math.abs(n.targetYaw-n.yaw)<1e-4&&(n.yaw=ue(n.yaw),n.targetYaw=n.yaw),ce>=.25&&(fe(),ce=0);const r=Ke/n.zoomScale,i=Math.cos(n.pitch),u=Math.sin(n.pitch),m=Math.cos(n.yaw),f=Math.sin(n.yaw);oe[0]=r*i*f,oe[1]=r*u,oe[2]=r*i*m,ae[0]=-i*f,ae[1]=-u,ae[2]=-i*m;const c=m,h=0,v=-f,T=-u*f,p=i,U=-u*m,A=n.rollDeg*Math.PI/180,E=Math.cos(A),b=Math.sin(A);O[0]=E*c-b*T,O[1]=E*h-b*p,O[2]=E*v-b*U,N[0]=b*c+E*T,N[1]=b*h+E*p,N[2]=b*v+E*U;const D=Math.hypot(O[1],N[1]);re[0]=D>1e-4?O[1]/D:0,re[1]=D>1e-4?N[1]/D:1,re[2]=Math.max(3.5,r)/13.2,$e(),t.uniform1f(l.uTime,be),t.uniform3fv(l.uCamPos,oe),t.uniform1f(l.uCamR0,r),t.uniform3fv(l.uCamForward,ae),t.uniform3fv(l.uCamRight,O),t.uniform3fv(l.uCamUp,N),t.uniform3fv(l.uBloomBasis,re),t.drawArrays(t.TRIANGLES,0,6),Ie()}et(g);fe();Ie();
+</script>
+  <style>
+:root{--panel-bg: rgba(6, 8, 13, .75);--border-hairline: rgba(226, 212, 190, .15);--border-active: rgba(226, 200, 155, .45);--gold-champagne: #e5c89b;--platinum: #f2f5f9;--slate-dim: #7e8a9c;--ok-green: #68d8a6}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-font-smoothing:antialiased}body,html{width:100%;height:100%;overflow:hidden;background-color:#000;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Microsoft YaHei,sans-serif;color:var(--platinum);touch-action:none;overscroll-behavior:none}canvas{display:block;width:100vw;height:100vh;cursor:grab;touch-action:none}canvas:active{cursor:grabbing}.hud-transition{transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1,.3,1)}body.hud-hidden .hud-panel{opacity:0;pointer-events:none;transform:translateY(8px)}.hud-header{position:fixed;top:26px;left:30px;pointer-events:none;z-index:10;mix-blend-mode:difference}.hud-header .eyebrow{font-size:.64rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold-champagne);opacity:.85;margin-bottom:4px;font-weight:500}.hud-header h1{font-size:1.22rem;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--platinum);margin-bottom:4px}.hud-header p{font-size:.73rem;color:var(--slate-dim);letter-spacing:.6px}.telemetry{position:fixed;bottom:26px;left:30px;width:236px;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;border-radius:0;padding:0;font-size:.7rem;line-height:1.65;pointer-events:none;z-index:10;font-variant-numeric:tabular-nums;box-shadow:none;mix-blend-mode:difference}.telemetry .perf-row{padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid rgba(226,212,190,.15);display:flex;justify-content:space-between;align-items:center;gap:10px;white-space:nowrap}.telemetry .label{color:var(--slate-dim);letter-spacing:.4px;flex:1;overflow:hidden;text-overflow:ellipsis}.telemetry .fps-badge{color:var(--ok-green);font-weight:500;font-family:SFMono-Regular,Consolas,monospace;flex-shrink:0;text-align:right}.telemetry .row{display:flex;justify-content:space-between;align-items:center;gap:10px;white-space:nowrap}.telemetry .val{color:var(--gold-champagne);font-family:SFMono-Regular,Consolas,monospace;flex-shrink:0;text-align:right}.fps-mini{display:none}.controls{position:fixed;top:24px;right:28px;width:260px;max-height:calc(100vh - 48px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;border-radius:0;padding:0;z-index:10;box-shadow:none;font-variant-numeric:tabular-nums;mix-blend-mode:difference}.controls::-webkit-scrollbar{width:12px}.controls::-webkit-scrollbar-track{background:transparent}.controls::-webkit-scrollbar-thumb{background:rgb(229 200 155 / var(--thumb-a));background-clip:padding-box;border:3px solid transparent;border-radius:6px;box-shadow:inset 0 0 0 1px #ffffff14,0 0 6px #00000040}.controls::-webkit-scrollbar-thumb:hover,.controls::-webkit-scrollbar-thumb:active{background-color:rgb(229 200 155 / var(--thumb-a))}.controls::-webkit-scrollbar-button{display:none;width:0;height:0}@supports not selector(::-webkit-scrollbar){.controls{scrollbar-width:thin;scrollbar-color:rgba(229,200,155,.22) transparent}}@property --fade-top{syntax: "<length>"; inherits: false; initial-value: 0px;}@property --fade-bottom{syntax: "<length>"; inherits: false; initial-value: 0px;}@property --thumb-a{syntax: "<number>"; inherits: true; initial-value: .22;}.controls{--fade-top: 0px;--fade-bottom: 0px;--thumb-a: .22;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade-top),#000 calc(100% - var(--fade-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade-top),#000 calc(100% - var(--fade-bottom)),transparent 100%);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1,.3,1),--fade-top .35s ease,--fade-bottom .35s ease,--thumb-a .18s ease-out}.controls.pressing{--thumb-a: .45}.controls.show-fade{--fade-bottom: 30px}.controls.show-fade-top{--fade-top: 30px}.controls h2{font-size:.82rem;font-weight:500;letter-spacing:1.5px;margin-bottom:9px;padding-bottom:5px;border-bottom:1.5px solid var(--gold-champagne);color:var(--gold-champagne);display:flex;justify-content:space-between;align-items:center;min-height:26px}.controls h2 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lang-switch-btn{width:34px;height:18px;padding:0;font-size:.6rem;letter-spacing:.5px;color:var(--slate-dim);background:#ffffff0a;border:1px solid rgba(255,255,255,.14);border-radius:3px;cursor:pointer;transition:all .2s ease;font-family:SFMono-Regular,Consolas,monospace;-webkit-user-select:none;user-select:none;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}.preset-row{display:flex;gap:6px;margin-bottom:9px}.preset-btn{flex:1 1 0;min-width:0;height:22px;padding:0 2px;font-size:.63rem;letter-spacing:.2px;background:none;border:none;border-bottom:1.5px solid rgba(255,255,255,.18);color:var(--slate-dim);border-radius:0;cursor:pointer;transition:all .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;text-align:center}.preset-btn.active{color:var(--gold-champagne);border-bottom-color:var(--gold-champagne);background:none}.control-group{margin-bottom:7px}.control-label{display:flex;justify-content:space-between;align-items:baseline;font-size:.68rem;color:var(--slate-dim);margin-bottom:2px;gap:8px}.control-label span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0}.control-label span:last-child{color:var(--gold-champagne);font-family:SFMono-Regular,Consolas,monospace;font-size:.68rem;flex-shrink:0;text-align:right}input[type=range]{width:100%;-webkit-appearance:none;-moz-appearance:none;appearance:none;height:2px;background:#ffffff38;border-radius:1px;outline:none;touch-action:pan-x}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--gold-champagne);cursor:pointer;box-shadow:0 0 8px #e5c89b8c;transition:transform .15s ease}.btn-row{display:flex;gap:6px;margin-top:6px}button.action-btn{flex:1 1 0;min-width:0;height:22px;padding:0 4px;font-size:.63rem;letter-spacing:.3px;color:var(--slate-dim);background:#ffffff08;border:1px solid rgba(255,255,255,.12);border-radius:3px;cursor:pointer;transition:all .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;text-align:center}button.action-btn.active{color:var(--gold-champagne);border-color:var(--gold-champagne);background:#e5c89b1a}.hud-bottom-bar{position:fixed;bottom:24px;right:24px;display:flex;align-items:center;gap:8px;z-index:20}.hud-toggle-btn{padding:6px 14px;font-size:.7rem;letter-spacing:.6px;color:var(--slate-dim);background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid rgba(255,255,255,.15);border-radius:20px;cursor:pointer;transition:all .25s ease;white-space:nowrap;font-family:inherit;font-variant-numeric:tabular-nums;min-width:104px;text-align:center;display:inline-flex;align-items:center;justify-content:center;mix-blend-mode:difference}.hud-landscape-btn{display:none;min-width:50px;padding:6px 12px}@media (hover: hover){.lang-switch-btn:hover{color:var(--gold-champagne);border-color:var(--gold-champagne);background:#e5c89b1f}.preset-btn:hover{color:var(--gold-champagne);border-bottom-color:var(--gold-champagne);background:none}input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}button.action-btn:hover:not(.active){color:var(--platinum);border-color:var(--border-active)}.hud-toggle-btn:hover{color:var(--platinum);border-color:var(--border-active);background:#ffffff0f}}.hud-text-short{display:none}.hud-text-full{display:inline}@media (max-width: 680px){.hud-header{top:16px;left:18px;right:18px}.hud-header h1{font-size:1.05rem}.hud-header p{font-size:.68rem}.controls{width:calc(100vw - 28px);top:auto;bottom:58px;right:14px;max-height:42vh;padding:13px 15px;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}.controls>*{flex-shrink:0}.controls h2{order:0}.controls .preset-row{order:1;margin-bottom:0}.controls .btn-row{order:2}.controls .btn-row+.btn-row{margin-bottom:9px}.controls .control-group{order:4}.controls .control-group:has(#slider-scale){order:3}.telemetry{display:none}.fps-mini{display:block;position:fixed;bottom:16px;left:14px;z-index:10;pointer-events:none;font-family:SFMono-Regular,Consolas,monospace;font-size:.68rem;color:var(--ok-green);mix-blend-mode:difference;font-variant-numeric:tabular-nums}.hud-text-short{display:inline}.hud-text-full{display:none}.hud-bottom-bar{bottom:16px;right:14px;gap:6px}.hud-landscape-btn{display:inline-flex;padding:5px 12px;font-size:.66rem;min-width:50px}.hud-toggle-btn{padding:5px 12px;font-size:.66rem;min-width:50px}}body.fullscreen-landscape .hud-landscape-btn{display:inline-flex!important;padding:5px 12px;font-size:.66rem;min-width:50px}
+</style>
+</head>
+<body>
+
+  <div class="hud-header hud-panel hud-transition">
+    <div class="eyebrow">Relativistic General Relativity Raytracer</div>
+    <h1 data-i18n="headerTitle">Gargantua // 卡冈都亚</h1>
+  </div>
+
+  <div class="telemetry hud-panel hud-transition">
+    <div class="perf-row">
+      <span class="label" data-i18n="telFps">实时帧率</span>
+      <span class="fps-badge" id="tel-fps">60 FPS (2.1 ms)</span>
+    </div>
+    <div class="row"><span class="label" data-i18n="telRes">渲染缓冲</span><span class="val" id="tel-res">1920×1080 (1.20x)</span></div>
+    <div class="row"><span class="label" data-i18n="telDist">视界距离</span><span class="val" id="tel-dist">1.00x (13.2 R<sub>s</sub>)</span></div>
+    <div class="row"><span class="label" data-i18n="telRsh">光子环Rc</span><span class="val" id="tel-rsh">2.60 R<sub>s</sub></span></div>
+    <div class="row"><span class="label" data-i18n="telInc">轨道姿态</span><span class="val" id="tel-inc">+8.1° / 24°</span></div>
+    <div class="row"><span class="label" data-i18n="telSeed">星域序列</span><span class="val" id="tel-seed">#A7F2</span></div>
+  </div>
+
+  <div class="fps-mini hud-panel hud-transition" id="fps-mini">60</div>
+
+  <div class="controls hud-panel hud-transition">
+    <h2>
+      <span data-i18n="controlsTitle">时空光学控制</span>
+      <button class="lang-switch-btn" id="btn-lang" title="点击切换语言 (快捷键: L)">EN</button>
+    </h2>
+
+    <div class="preset-row">
+      <button class="preset-btn active" data-pitch="0.142" data-scale="1.00" data-roll="-10" data-i18n="preset1">经典卡冈都亚</button>
+      <button class="preset-btn" data-pitch="0.038" data-scale="1.15" data-roll="-4" data-i18n="preset2">掠射赤道 88°</button>
+      <button class="preset-btn" data-pitch="1.5708" data-scale="0.85" data-roll="0" data-i18n="preset3">极轴俯瞰 90°</button>
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblZoom">视界尺度</span>
+        <span id="val-zoom">1.00x</span>
+      </div>
+      <input type="range" id="slider-zoom" min="0.10" max="2.50" step="0.01" value="1.00" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblGlow">吸积盘光度</span>
+        <span id="val-glow">1.22</span>
+      </div>
+      <input type="range" id="slider-glow" min="0.40" max="2.40" step="0.05" value="1.22" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblDoppler">多普勒集束</span>
+        <span id="val-doppler">1.00</span>
+      </div>
+      <input type="range" id="slider-doppler" min="0.00" max="1.60" step="0.05" value="1.00" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblTemp">黑体色温</span>
+        <span id="val-temp">1.00</span>
+      </div>
+      <input type="range" id="slider-temp" min="0.60" max="1.60" step="0.05" value="1.00" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblCosmos">星尘丰度</span>
+        <span id="val-cosmos">1.05</span>
+      </div>
+      <input type="range" id="slider-cosmos" min="0.00" max="2.00" step="0.05" value="1.05" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblTwinkle">星光闪烁</span>
+        <span id="val-twinkle">1.00</span>
+      </div>
+      <input type="range" id="slider-twinkle" min="0.00" max="3.00" step="0.05" value="1.00" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblBloom">镜头眩光</span>
+        <span id="val-bloom">0.80</span>
+      </div>
+      <input type="range" id="slider-bloom" min="0.00" max="2.00" step="0.05" value="0.80" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblSpeed">轨道角速</span>
+        <span id="val-speed">1.00</span>
+      </div>
+      <input type="range" id="slider-speed" min="0.00" max="2.20" step="0.05" value="1.00" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblRoll">镜头倾角</span>
+        <span id="val-roll">-10°</span>
+      </div>
+      <input type="range" id="slider-roll" min="-180" max="180" step="1" value="-10" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblScale">超采样率</span>
+        <span id="val-scale">1.20x</span>
+      </div>
+      <input type="range" id="slider-scale" min="0.50" max="1.80" step="0.05" value="1.20" />
+    </div>
+
+    <div class="btn-row">
+      <button id="btn-drs" class="action-btn active" title="自动保持满帧运行，最高超采样至 1.30x">自适应满帧: 开</button>
+      <button id="btn-autorotate" class="action-btn active">轨道巡航: 开</button>
+    </div>
+    <div class="btn-row">
+      <button id="btn-photonring-toggle" class="action-btn" data-i18n="photonRing">光子环</button>
+      <button id="btn-legacy-shadow" class="action-btn" data-i18n="legacyShadow">旧版黑洞</button>
+      <button id="btn-random-cosmos" class="action-btn" data-i18n="randomCosmos">随机星域</button>
+      <button id="btn-reset" class="action-btn" data-i18n="resetAll">全部重置</button>
+    </div>
+  </div>
+
+  <div class="hud-bottom-bar" id="hud-bottom-bar">
+    <button class="hud-toggle-btn hud-landscape-btn" id="btn-landscape" title="切换横屏 / 竖屏">横屏</button>
+    <button class="hud-toggle-btn" id="btn-toggle-hud" title="快捷键: H"><span class="hud-text-full">隐藏界面 (H)</span><span class="hud-text-short">隐藏</span></button>
+  </div>
+
+  <canvas id="glcanvas"></canvas>
+
+</body>
+</html>
