@@ -5,18 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>GARGANTUA // 卡冈都亚</title>
   <script type="module">
-const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,depth:!1,stencil:!1,antialias:!1,preserveDrawingBuffer:!1,powerPreference:"high-performance"})||S.getContext("experimental-webgl");if(!e)throw document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#e5c89b;font-size:0.9rem;z-index:999;">您的浏览器不支持 WebGL，无法运行实时黑洞模拟。</div>'),new Error("WebGL not supported");function nt(t,n=512){const a=new Uint8Array(n*n*4),r=new Float32Array(n*n*3);for(let p=0;p<n*n*3;p++){const l=Math.sin(p*12.9898+78.233)*43758.5453;r[p]=l-Math.floor(l)}function s(p,l,g,c,u,x){const y=p+u,b=l+x,w=Math.floor(y),L=Math.floor(b),E=(w%g+g)%g,_=(L%g+g)%g,C=(E+1)%g,q=(_+1)%g,A=y-w,U=b-L,K=A*A*A*(A*(A*6-15)+10),$=U*U*U*(U*(U*6-15)+10),j=_*n,De=q*n,Ce=r[(j+E)*3+c],et=r[(j+C)*3+c],Le=r[(De+E)*3+c],tt=r[(De+C)*3+c];return(Ce+(et-Ce)*K)*(1-$)+(Le+(tt-Le)*K)*$}const h=1/n;for(let p=0;p<n;p++){const l=p*h;for(let g=0;g<n;g++){const c=g*h;let u=0,x=0,y=0,b=.5,w=5;for(let E=0;E<5;E++){const _=E*3.71,C=E*5.13,q=c*w,A=l*w,U=s(q,A,w,0,_,C),K=s(q*2,A*2,w*2,1,C,_),$=s(q,A,w,2,_+2.1,C+1.7),j=Math.sqrt(Math.abs($*2-1));u+=b*U,x+=b*K,y+=b*j,w*=2,b*=.5}const L=(p*n+g)*4;a[L]=Math.min(255,Math.max(0,u*255|0)),a[L+1]=Math.min(255,Math.max(0,x*255|0)),a[L+2]=Math.min(255,Math.max(0,y*255|0)),a[L+3]=255}}const m=t.createTexture();t.bindTexture(t.TEXTURE_2D,m),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,n,n,0,t.RGBA,t.UNSIGNED_BYTE,a),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_S,t.REPEAT),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_T,t.REPEAT),t.generateMipmap(t.TEXTURE_2D),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_MIN_FILTER,t.LINEAR_MIPMAP_LINEAR),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_MAG_FILTER,t.LINEAR);const f=t.getExtension("EXT_texture_filter_anisotropic")||t.getExtension("MOZ_EXT_texture_filter_anisotropic")||t.getExtension("WEBKIT_EXT_texture_filter_anisotropic");if(f){const p=t.getParameter(f.MAX_TEXTURE_MAX_ANISOTROPY_EXT);t.texParameterf(t.TEXTURE_2D,f.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(16,p))}return m}function Pe(t,n,a){const r=t.createShader(n);if(t.shaderSource(r,a),t.compileShader(r),!t.getShaderParameter(r,t.COMPILE_STATUS)){const s=t.getShaderInfoLog(r);throw t.deleteShader(r),new Error(`Shader compile failed: ${s}`)}return r}function Be(t,n,a,r){const s=Pe(t,t.VERTEX_SHADER,n),h=Pe(t,t.FRAGMENT_SHADER,a),m=t.createProgram();if(t.attachShader(m,s),t.attachShader(m,h),t.linkProgram(m),!t.getProgramParameter(m,t.LINK_STATUS)){const f=t.getProgramInfoLog(m);throw new Error(`[${r||"program"}] Program link failed: ${f}`)}return m}const ot=`      attribute vec2 aPosition;
-      varying vec2 vUv;
+const w=document.getElementById("glcanvas"),e=w.getContext("webgl2",{alpha:!1,depth:!1,stencil:!1,antialias:!1,preserveDrawingBuffer:!1,powerPreference:"high-performance"});if(!e)throw document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#e5c89b;font-size:0.9rem;z-index:999;">您的浏览器不支持 WebGL2，无法运行实时黑洞模拟。</div>'),new Error("WebGL2 not supported");function Ut(t,n=512){const a=new Uint8Array(n*n*4),r=new Float32Array(n*n*3);for(let c=0;c<n*n*3;c++){const u=Math.sin(c*12.9898+78.233)*43758.5453;r[c]=u-Math.floor(u)}function i(c,u,v,m,p,S){const T=c+p,E=u+S,b=Math.floor(T),A=Math.floor(E),x=(b%v+v)%v,M=(A%v+v)%v,P=(x+1)%v,K=(M+1)%v,U=T-b,O=E-A,ne=U*U*U*(U*(U*6-15)+10),oe=O*O*O*(O*(O*6-15)+10),ae=M*n,Ye=K*n,We=r[(ae+x)*3+m],Ft=r[(ae+P)*3+m],Ke=r[(Ye+x)*3+m],_t=r[(Ye+P)*3+m];return(We+(Ft-We)*ne)*(1-oe)+(Ke+(_t-Ke)*ne)*oe}const f=1/n;for(let c=0;c<n;c++){const u=c*f;for(let v=0;v<n;v++){const m=v*f;let p=0,S=0,T=0,E=.5,b=5;for(let x=0;x<5;x++){const M=x*3.71,P=x*5.13,K=m*b,U=u*b,O=i(K,U,b,0,M,P),ne=i(K*2,U*2,b*2,1,P,M),oe=i(K,U,b,2,M+2.1,P+1.7),ae=Math.sqrt(Math.abs(oe*2-1));p+=E*O,S+=E*ne,T+=E*ae,b*=2,E*=.5}const A=(c*n+v)*4;a[A]=Math.min(255,Math.max(0,p*255|0)),a[A+1]=Math.min(255,Math.max(0,S*255|0)),a[A+2]=Math.min(255,Math.max(0,T*255|0)),a[A+3]=255}}const s=t.createTexture();t.bindTexture(t.TEXTURE_2D,s),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,n,n,0,t.RGBA,t.UNSIGNED_BYTE,a),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_S,t.REPEAT),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_T,t.REPEAT),t.generateMipmap(t.TEXTURE_2D),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_MIN_FILTER,t.LINEAR_MIPMAP_LINEAR),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_MAG_FILTER,t.LINEAR);const h=t.getExtension("EXT_texture_filter_anisotropic")||t.getExtension("MOZ_EXT_texture_filter_anisotropic")||t.getExtension("WEBKIT_EXT_texture_filter_anisotropic");if(h){const c=t.getParameter(h.MAX_TEXTURE_MAX_ANISOTROPY_EXT);t.texParameterf(t.TEXTURE_2D,h.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(16,c))}return s}function Ze(t,n,a){const r=t.createShader(n);if(t.shaderSource(r,a),t.compileShader(r),!t.getShaderParameter(r,t.COMPILE_STATUS)){const i=t.getShaderInfoLog(r);throw t.deleteShader(r),new Error(`Shader compile failed: ${i}`)}return r}function Te(t,n,a,r){const i=Ze(t,t.VERTEX_SHADER,n),f=Ze(t,t.FRAGMENT_SHADER,a),s=t.createProgram();if(t.attachShader(s,i),t.attachShader(s,f),t.linkProgram(s),!t.getProgramParameter(s,t.LINK_STATUS)){const h=t.getProgramInfoLog(s);throw new Error(`[${r||"program"}] Program link failed: ${h}`)}return s}const Bt=`#version 300 es
+      in vec2 aPosition;
+      out vec2 vUv;
       void main() {
         vUv = aPosition;
         gl_Position = vec4(aPosition, 0.0, 1.0);
       }
-`,at=`      // shaders/bake.frag.glsl —— 星云 Cubemap 离屏烘焙：
+`,It=`#version 300 es
+      // shaders/bake.frag.glsl —— 星云 Cubemap 离屏烘焙：
       // uPass 0 输出星云颜色与星团密度（A），uPass 1 只输出区域包络（R）
       precision highp float;
       precision highp int;
       precision highp sampler2D;
-      varying vec2 vUv;
+      in vec2 vUv;
+      out vec4 fragColor;
 
       uniform int uFace;
       uniform int uPass;
@@ -49,15 +52,15 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         vec2 uvY = p.zx * 0.52 + uCosmosSeed.zw;
         vec2 uvZ = p.xy * 0.52 + uCosmosSeed.yx;
 
-        outLow = texture2D(uNoiseTex, uvX).rgb * w.x
-                + texture2D(uNoiseTex, uvY).rgb * w.y
-                + texture2D(uNoiseTex, uvZ).rgb * w.z;
+        outLow = texture(uNoiseTex, uvX).rgb * w.x
+                + texture(uNoiseTex, uvY).rgb * w.y
+                + texture(uNoiseTex, uvZ).rgb * w.z;
 
         vec2 curlWarp = vec2(outLow.r - outLow.g, outLow.b - outLow.r) * 0.34;
 
-        outHigh = texture2D(uNoiseTex, uvX * 2.15 + curlWarp).rgb * w.x
-                + texture2D(uNoiseTex, uvY * 2.15 - curlWarp.yx).rgb * w.y
-                + texture2D(uNoiseTex, uvZ * 2.15 + vec2(curlWarp.y, -curlWarp.x)).rgb * w.z;
+        outHigh = texture(uNoiseTex, uvX * 2.15 + curlWarp).rgb * w.x
+                + texture(uNoiseTex, uvY * 2.15 - curlWarp.yx).rgb * w.y
+                + texture(uNoiseTex, uvZ * 2.15 + vec2(curlWarp.y, -curlWarp.x)).rgb * w.z;
       }
 
       void main() {
@@ -87,8 +90,9 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         float regionEnv = clamp(brokenStream * 0.50 + patch1 * 0.62 + patch2 * 0.56 + patch3 * 0.52, 0.0, 1.25);
 
         // 精简通道：只存区域包络，主着色器按 R 取 regionEnv
+        // [COUPLED ↔ main.frag.glsl ×1.6 解码] 0.625 为 8bit 回退保动态余量的压缩编码，1.6 为精确逆；成对勿单改
         if (uPass == 1) {
-          gl_FragColor = vec4(regionEnv * 0.625, 0.0, 0.0, 1.0);
+          fragColor = vec4(regionEnv * 0.625, 0.0, 0.0, 1.0);
           return;
         }
 
@@ -97,7 +101,7 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
 
         if (regionEnv > 0.005) {
           vec2 uvMicro = (p.xz + p.xy * 0.6) * 3.8 + vec2(nHigh.r, nHigh.g) * 0.45;
-          vec3 nMicro = texture2D(uNoiseTex, uvMicro).rgb;
+          vec3 nMicro = texture(uNoiseTex, uvMicro).rgb;
 
           float billowCloud = smoothstep(0.30, 0.86, nLow.r * 0.35 + nHigh.g * 0.40 + nMicro.r * 0.25);
           float wispyPlume  = pow(smoothstep(0.36, 0.90, nHigh.b * 0.55 + nMicro.b * 0.45), 1.45);
@@ -114,20 +118,27 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
           starClusterDensity = regionEnv * (0.45 + 0.85 * wispyPlume) * (1.0 - darkBay * 0.75);
         }
 
-        gl_FragColor = vec4(min(nebula, vec3(0.25)) * 4.0, min(starClusterDensity, 1.0) * 0.625);
+        // [COUPLED ↔ main.frag.glsl ×0.25/×1.6 解码] RGB min(·,0.25)×4↔×0.25、A 星团密度×0.625↔×1.6；成对勿单改
+        fragColor = vec4(min(nebula, vec3(0.25)) * 4.0, min(starClusterDensity, 1.0) * 0.625);
       }
-`,rt=`      attribute vec2 aPosition;
+`,Xe=`#version 300 es
+      in vec2 aPosition;
       void main() {
         gl_Position = vec4(aPosition, 0.0, 1.0);
       }
-`,it=`      precision highp float;
+`,Mt=`#version 300 es
+      precision highp float;
       precision highp int;
       precision highp sampler2D;
       precision highp samplerCube;
+      out vec4 fragColor;
 
       uniform vec2 uResolution;
       uniform float uInvMinDim;
       uniform float uResSharp;
+      uniform float uStarAbundance;
+      uniform float uStarAmp;
+      uniform float uStarFadeBlend;
       uniform float uTime;
       uniform vec3 uCamPos;
       uniform float uCamR0;
@@ -144,6 +155,7 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
       uniform float uTwinkle;
       uniform float uLegacyShadow;
       uniform float uPhotonRing;
+      uniform float uHdrScene;   // 1 = 输出线性 HDR 交由 present 端色调映射，0 = 原位映射（8 位回退）
 
       uniform vec3 uBloomBasis;
       uniform vec3 uStarShift1;
@@ -177,6 +189,11 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
       }
 
       vec3 renderPinpointStarLayer(vec3 dir, float scale, float threshold, float brightness, float pixelSharpness, vec3 seedShift) {
+        // 低分辨率抗混叠：星格画布间距 <~1px 时才明显淡出，其余保持原样；
+        // 淡出强度由 uStarFadeBlend 提供（与 state.js STAR_*_BLEND 并列，集中在那里调）
+        float cellPixels = 1.0 / (scale * uInvMinDim);
+        float layerFade = 1.0 - uStarFadeBlend * (1.0 - smoothstep(1.0, 2.0, cellPixels));
+
         vec3 p = dir * scale + seedShift;
         p += hash33(floor(p * 0.25) + vec3(7.13, 5.71, 3.97)) - 0.5;
         vec3 cell = floor(p);
@@ -220,37 +237,62 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         // sizeVar 只缩放幅度不缩放核宽：亚像素下核宽被 clamp 为定值，幅度缩放均值 1.0 且保留大小差异
         float core = exp(-d2Core) * sizeVar * (1.0 - smoothstep(0.10, 0.18, d2));
 
-        return starCol * ((core + halo) * mag * brightness * twinkle);
+        return starCol * ((core + halo) * mag * brightness * twinkle) * layerFade;
       }
 
       vec3 getNaturalStardustCosmos(vec3 dir) {
         vec3 col = vec3(0.0006, 0.0009, 0.0016);
 
-        vec4 nebSample = textureCube(uNebulaCube0, dir);
-        float regionEnv = textureCube(uNebulaCube1, dir).r * 1.6;
+        vec4 nebSample = texture(uNebulaCube0, dir);
+        // 解码端：×1.6 与 ×0.25 分别对应 bake.frag 的 0.625 / min(·,0.25)×4 编码对，成对勿单改
+        float regionEnv = texture(uNebulaCube1, dir).r * 1.6;
 
         col += (nebSample.rgb * 0.25) * uCosmos;
         float starClusterDensity = nebSample.a * 1.6;
 
         vec3 stars = vec3(0.0);
         if (starClusterDensity > 0.02) {
-          stars += renderPinpointStarLayer(dir, 440.0, 0.60, 0.82 * starClusterDensity, 740.0 * uResSharp, uStarShift1);
-          stars += renderPinpointStarLayer(dir, 275.0, 0.69, 1.05 * starClusterDensity, 640.0 * uResSharp, uStarShift2);
+          // 星点锐度按短边 850（state.js 标定基准）校准，随 uResSharp 平方律缩放
+          stars += renderPinpointStarLayer(dir, 440.0, 0.70, 0.82 * starClusterDensity, 740.0 * uResSharp, uStarShift1);
+          stars += renderPinpointStarLayer(dir, 275.0, 0.77, 1.05 * starClusterDensity, 640.0 * uResSharp, uStarShift2);
         }
-        stars += renderPinpointStarLayer(dir, 185.0, 0.76, 1.10 * (0.55 + 0.65 * regionEnv), 560.0 * uResSharp, uStarShift3);
-        stars += renderPinpointStarLayer(dir, 105.0, 0.84, 1.65 * (0.70 + 0.45 * regionEnv), 490.0 * uResSharp, uStarShift4);
-        stars += renderPinpointStarLayer(dir, 50.0,  0.91, 2.75, 420.0 * uResSharp, uStarShift5);
+        stars += renderPinpointStarLayer(dir, 185.0, 0.82, 1.10 * (0.55 + 0.65 * regionEnv), 560.0 * uResSharp, uStarShift3);
+        stars += renderPinpointStarLayer(dir, 105.0, 0.90, 1.65 * (0.70 + 0.45 * regionEnv), 490.0 * uResSharp, uStarShift4);
+        stars += renderPinpointStarLayer(dir, 50.0,  0.94, 2.75, 420.0 * uResSharp, uStarShift5);
 
-        col += stars * (0.35 + 0.65 * uCosmos);
+        // 低分辨率星点收敛（三条并列，强度见 state.js STAR_*_BLEND）：uStarAbundance（线性丰度）
+        // × uStarAmp（FIT 曲线）× layerFade（星层淡出）。默认档与高分辨率三者均退化为 1
+        col += stars * (0.35 + 0.65 * uCosmos) * uStarAbundance * uStarAmp;
         return col;
       }
 
+      // 常数标签（全文沿用；未标注的数值默认视为 [ART]）：
+      //   [EXACT] 精确式，禁改值禁"简化"
+      //   [FIT]   拟合产物，禁单项手调，再生须按原法重算整组
+      //   [TOL]   严格值+刻意裕量，禁"修正"回严格值
+      //   [ART]   视觉调参，"ART-xxx" 后缀变体同属可调
+      //   [COUPLED ↔ x] 与 x 联动，改动须两处同步
+
       // 吸积盘几何唯一来源（rs=1 归一化坐标），canReachDiskSlab() 与 main() 共用，勿另写字面量
-      const float DISK_H = 0.098;
-      const float DISK_R_IN = 2.26;
-      const float DISK_R_OUT = 10.2;
-      const float DISK_R_IN2 = 5.1076;   // DISK_R_IN ^ 2
-      const float DISK_R_OUT2 = 104.04;  // DISK_R_OUT ^ 2
+      const float DISK_H = 0.098;        // [ART] 盘半厚
+      const float DISK_R_IN = 2.26;      // [ART] 盘内缘（ISCO 严格值为 3.0，视觉取内侧）
+      const float DISK_R_OUT = 10.2;     // [ART] 盘外缘 [COUPLED ↔ rBound = 此值 + 0.55]
+      const float DISK_R_IN2 = DISK_R_IN * DISK_R_IN;    // 平方由上式派生，勿写死字面量
+      const float DISK_R_OUT2 = DISK_R_OUT * DISK_R_OUT;
+
+      // 光子环/阴影族（rs=1）
+      const float bCrit = 1.5 * sqrt(3.0);  // [EXACT] 临界撞击参数 3√3/2·rs = 2.598076211（光子球 r=1.5rs）
+      // [TOL][COUPLED ↔ bShadow] 捕获遮罩：bCrit²=6.75 放宽约 1.5%，把绕光子球多圈、积分出噪点的
+      // 近临界射线收进阴影；isCapturedOrbit（第 1/2 节）据它判吞没。禁改回 6.75
+      const float captureB2 = 6.85;
+      const float bShadow = sqrt(captureB2);  // 环辉临界带外边界，派生自 captureB2
+
+      // 密度包络：细丝项经 clamp 后 ≤ DENS_FIL，日冕项在发射点（radialNorm>0）≤ CORONA_MAX，
+      // 故密度系数恒 ≤ DENS_MAX，emitPossible 门限据此成立
+      const float DENS_BASE = 0.16;       // [ART] 盘底发射分量
+      const float DENS_FIL = 0.84;        // [ART] 细丝调制权重
+      const float CORONA_MAX = 0.45;      // [ART] 日冕内缘幅值
+      const float DENS_MAX = DENS_BASE + DENS_FIL + CORONA_MAX;  // 密度系数上界（勿单独改）
 
       // 精确可达性判定：直线射线能否触及盘板体（rIn ≤ r ≤ rOut 且 |y| ≤ diskH）。
       // y 区间与 r 不等式区间求交；转移只发生在直线真实相切处，该处盘缘发射已连续趋零
@@ -310,8 +352,8 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         const float invDiskSpan = 1.0 / (rOut - rIn);
         const float diskH = DISK_H;           // disk half-thickness (Rs)
         const float invDiskH = 1.0 / DISK_H;
-        const float rBound = 10.75;      // outer bounding sphere radius (Rs)
-        const float rBound2 = 115.5625;  // rBound ^ 2
+        const float rBound = 10.75;      // [COUPLED ↔ DISK_R_OUT] 外包围球半径（须罩住整张盘：DISK_R_OUT + 0.55）
+        const float rBound2 = rBound * rBound;
 
         float r0 = uCamR0;
         float rDotD0 = dot(pos, dir0);
@@ -322,6 +364,8 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
 
         vec3 ePerp = b > 1e-5 ? (-pPerp0 / b) : vec3(0.0);
         float b2Safe = max(impactParameterSquared, 1e-4);
+        // [EXACT] 一阶弱场偏折 δ₁(c) = (rs/2b)·(1-c)²(2+c) 闭式（自当前点积分到无穷远），baseWeakTerm
+        //         即去常数后的 (1-c)²(2+c)/b²，两分支借 b²=r0²(1-c²) 代数等价；分母 1e-4 仅防 b→0 [TOL]
         float denom = (cosRayAngle0 >= 0.0)
           ? max(1e-4, r0 * r0 * (1.0 + cosRayAngle0))
           : (b2Safe / (1.0 - cosRayAngle0));
@@ -346,6 +390,7 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
               float rE = length(entryPos);
               float uE = dot(entryPos, dir) / rE;
               float oneMinusUE = 1.0 - uE;
+              // [EXACT] 入球前已积累偏折 = δ₁(c0) − δ₁(uE)，闭式同 baseWeakTerm 注
               float deltaThetaEntry = 0.5 * rs * b * (
                 baseWeakTerm - (oneMinusUE * oneMinusUE * (2.0 + uE)) / b2Safe
               );
@@ -355,7 +400,7 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
           }
         }
 
-        bool isCapturedOrbit = (impactParameterSquared < 6.85) && (rDotD0 < 0.0);
+        bool isCapturedOrbit = (impactParameterSquared < captureB2) && (rDotD0 < 0.0);
 
         // 黑洞阴影内部在抵达 r < rIn 前若直线路径不可能触碰前景吸积盘薄板，直接 0 步跳过循环
         if (!skipLoop && isCapturedOrbit && abs(pos.y) > diskH && !canReachDiskSlab(pos, dir)) {
@@ -373,6 +418,8 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         bool useLegacy = uLegacyShadow > 0.5;
 
         if (!skipLoop) {
+          // [EXACT] a = −1.5·rs·h²·r̂/r⁴，对应轨道方程 u″+u = 1.5·rs·u²（Schwarzschild 零测地线
+          //         轨道形状，仅参数化不同）；系数 −1.5 禁改
           float neg15RsH2 = -1.5 * rs * impactParameterSquared;
           float invR = 1.0 / r;
           float invR2 = invR * invR;
@@ -389,6 +436,8 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
             float dirLen = useLegacy ? 1.0 : (dirLen2 * invDirLen);
             float absDirY = abs(dir.y);
 
+            // [TOL] 视界 1.02（严格 1.0）、陷阱 1.45（判定阈值，非光子球半径 1.5）：把 captureB2
+            // 漏网的近临界内向射线收进阴影，防步进绕光子球出噪点
             if (r < 1.02 || (r < 1.45 && rDotD < 0.0)) {
               swallowed = true;
               break;
@@ -410,6 +459,8 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
                 swallowed = false;
                 break;
               }
+              // [ART-几何] 提前逃逸判据的充分性裕度（0.55/1.50/0.25 手调、r>2.4 门限）：收紧可能在盘面
+              // 附近漏步进（影缘/亮带闪烁），放宽只是多跑几步；判错会把未逃逸射线当星空，改后查影缘
               if (r > 2.4 && absY > diskH && pos.y * dir.y > 0.0) {
                 if (absDirY * r2 * r > -0.55 * neg15RsH2 * dirLen ||
                     absDirY * r2 * r2 > -1.50 * neg15RsH2 * (absY * dirLen + 0.25 * r * absDirY)) {
@@ -471,15 +522,17 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
 
                   float ua = clamp((pos.y + dy * tEnter) * invDiskH, -1.0, 1.0);
                   float ub = clamp((pos.y + dy * tExit) * invDiskH, -1.0, 1.0);
-                  float verticalFalloff = max(0.0, 1.0 - (ua * ua + ua * ub + ub * ub) * 0.333333);
+                  // [EXACT] 抛物剖面 (1-u²) 的弦段均值 = (ub³-ua³)/(3(ub-ua)) = (ua²+ua·ub+ub²)/3
+                  float verticalFalloff = max(0.0, 1.0 - (ua * ua + ua * ub + ub * ub) * (1.0 / 3.0));
 
                   float baseEnv = radialFalloff * verticalFalloff;
-                  float innerCorona = exp(-radialNorm * 8.5) * 0.45;
+                  float innerCorona = exp(-radialNorm * 8.5) * CORONA_MAX;  // 8.5 内缘衰减陡度 [ART]
 
-                  // 等价提前退出：filamentStructure ≤ 1，故 transmittance*baseEnv*1.45 不过门限时可跳过纹理采样
-                  bool emitPossible = (transmittance * baseEnv * 1.45) > 0.0012;
+                  // 提前退出依据：density ≤ baseEnv·DENS_MAX（上界见文件头），不过门限即可跳过纹理采样
+                  bool emitPossible = (transmittance * baseEnv * DENS_MAX) > 0.0012;
 
                   // 纹理与密度取同一点（samplePos），逐次重采：门限与 rIn2 裁剪均为等价裁剪，旧值不会被误用
+                  // [TOL] 纹理门（·1.06）刻意比发射门宽 6%：盘缘过渡带仍有纹理、发射由下方门裁出，禁"统一"
                   if (emitPossible && sampleR2 > rIn2 && sampleR2 < rOut2 * 1.06) {
                     vec3 texPos = samplePos;
                     float texR2 = clamp(sampleR2, rIn2 * 1.001, rOut2 * 0.999);
@@ -491,20 +544,29 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
                     float mipBias = clamp(0.5 * log2(max(drPixel2, 1e-6) * 14.44), -0.45, 1.35);
 
                     float angle = atan(texPos.z, texPos.x);
+                    // [ART] 视觉自转角速度（超开普勒）；严格开普勒值 Ω = √(0.5)·r^-1.5 ≈ 0.7071·r^-1.5（M=rs/2）
+                    // 下方 mod 回绕只要求 ω>0，改本式的系数/指数均安全
                     float omega = 2.35 * pow(invTexR, 1.35);
                     float spinPeriod = 6.2831853 / max(omega * uSpeed, 1e-4);
                     float spinTime = mod(uTime, spinPeriod);
+                    // [COUPLED ↔ uvShear1/2/3 的 uAngle 系数（1/3/6 均须整数）、下方 sinVec 的角频率]
+                    // uAngle 以圈为单位（0.15915494 = 1/2π），spinTime 每圈回绕使其跳恰 1 圈，由整数系数与
+                    // ≈2π 整数倍 sin 频率（6.28318≈2π、12.56637≈4π）吸收；改非整数即出接缝
                     float uAngle = (angle + spinTime * omega * uSpeed) * 0.15915494;
 
                     float logR = log(texR * (1.0 / rIn));
+                    // [COUPLED ↔ js/main.js] uTime 回绕 36000 对纹理的影响（改周期或速度须两处同步复核）：
+                    // 线性项 uSpeed=1（或滑杆网格上 0.25 的整数倍）时 36000×0.015/0.024/0.032 为整数、无缝，
+                    // 其余速度的 0.024/0.032 通道跳非整数格；盘旋转通道跳 -(36000 mod spinPeriod)/spinPeriod 圈、
+                    // 随半径变化，任何速度都有一帧跳（既有行为，不撕裂、不累积）
                     vec2 uvShear1 = vec2(uAngle + logR * 0.58, logR * 1.55 - uTime * 0.015 * uSpeed);
                     vec2 uvShear2 = vec2(uAngle * 3.0 - logR * 1.10, texR * 0.68 + uTime * 0.024 * uSpeed);
                     vec2 uvShear3 = vec2(uAngle * 6.0 + logR * 1.85, texR * 1.45 - uTime * 0.032 * uSpeed);
 
-                    vec3 tex1 = texture2D(uNoiseTex, uvShear1, mipBias).rgb;
-                    vec3 tex2 = texture2D(uNoiseTex, uvShear2 + tex1.rg * 0.06, mipBias).rgb;
+                    vec3 tex1 = texture(uNoiseTex, uvShear1, mipBias).rgb;
+                    vec3 tex2 = texture(uNoiseTex, uvShear2 + tex1.rg * 0.06, mipBias).rgb;
                     float tex3 = (transmittance > 0.24)
-                      ? texture2D(uNoiseTex, uvShear3 - tex2.gb * 0.04, mipBias + 0.25).b
+                      ? texture(uNoiseTex, uvShear3 - tex2.gb * 0.04, mipBias + 0.25).b
                       : (0.5 * (tex1.g + tex2.r));
 
                     vec3 w123 = exp(vec3(-40.5, -352.8, -1862.08) * drPixel2);
@@ -521,16 +583,24 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
                   }
 
                   if (sampleR2 > rIn2 && sampleR2 < rOut2) {
-                    float density = baseEnv * (0.16 + 0.84 * filamentStructure + innerCorona);
+                    float density = baseEnv * (DENS_BASE + DENS_FIL * filamentStructure + innerCorona);
 
+                    // 门限与上方 emitPossible（transmittance·baseEnv·DENS_MAX > 0.0012）同源，两点须一致
                     if (transmittance * density > 0.0012) {
                       float invSampleR2 = invSampleR * invSampleR;
+                      // [EXACT] 柱面半径倒数 1/√(r²−y²) 的一阶展开 (1/r)(1+0.5y²/r²)，掠射防削波够用
                       float inverseSlantRadius = invSampleR * (1.0 + 0.5 * samplePos.y * samplePos.y * invSampleR2);
                       float cosTheta = (samplePos.z * midU.x - samplePos.x * midU.z) * inverseSlantRadius;
+                      // [ART] 轨道速度取牛顿级 √(0.5rs/r)（严格 GR 局域速度还差 /√(1-rs/r)，ISCO 处 0.5c，未采用）
                       float orbitalBeta = clamp(sqrt(0.5 * invSampleR), 0.0, 0.66);
+                      // [ART] 多普勒用一阶线性化 1+βcosθ，增益 1.42、下限 0.22、集束指数 2.55 为视觉调参；
+                      // 严格式为 δ = 1/(γ(1-βcosθ))、强度 ∝ δ³（未严格化）
                       float dopplerFactor = max(0.22, 1.0 + uDoppler * orbitalBeta * cosTheta * 1.42);
+                      // [EXACT] 静态发射体引力红移 √(1-rs/r)；0.10 下限 [TOL] 防 r→rs 奇异
+                      // （绕行物质的严格联合频移 g = √(1-1.5rs/r)/(1-Ωb·cosφ) 未严格化，由视觉增益代偿）
                       float gravRedshift = sqrt(max(0.10, 1.0 - invSampleR));
 
+                      // [ART] 风格化温度剖面，近似 Shakura–Sunyaev 薄盘 T ∝ r^(-3/4)
                       float localTemp = (1.04 - 0.62 * pow(radialNorm, 0.72) + 0.26 * filamentStructure) * dopplerFactor * gravRedshift * uTemp;
                       vec3 emitCol = planckBlackbody(localTemp);
 
@@ -573,18 +643,22 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         // =========================================================================
         // 3. 延迟计算引力透镜偏折角、光子环与深空星域合成
         // =========================================================================
-        const float bCrit = 2.598076;    // critical impact parameter = 3*sqrt(3)/2 * Rs
+        // （bCrit / bShadow 已上移至文件头常数族，勿本地另写）
 
-        // 光子环由撞击参数 b 直接驱动，峰值压在 bCrit 上（不走 minR，其被阴影遮罩截断）
+        // 光子环由撞击参数 b 驱动、峰值锚定 bCrit；不用球面最近点：临界带射线已判吞没（第 1/2 节）无近点
         bool ringOn = uPhotonRing > 0.5;
-        const float bShadow = 2.617314;  // sqrt(6.85)，6.85 遮罩给出的阴影边界
+        // [ART] 环辉轮廓：110 锐尾、10 柔晕、0.14/0.95/0.9 幅度；[bCrit,bShadow] 临界带只补环辉、压被压缩星像
         float bandRing = exp(-max(0.0, b - bCrit) * 110.0);
 
         if (!swallowed) {
           float bSafe = max(b, 0.6 * rs);
+          // [EXACT] 一阶+二阶弱场：δ₁ 闭式（见 baseWeakTerm 注）乘 (1+15π·rs/32b)；
+          // 15π/32=1.4726 为 α=2rs/b+(15π/16)(rs/b)² 的严格二阶系数（借用全程光线系数）
           float thetaWeak = 0.5 * rs * b * baseWeakTerm * (1.0 + (15.0 * 3.14159265 * rs) / (32.0 * bSafe));
 
-          // 强场偏折拟合（b∈[2.8,13] 残差<0.08 rad）：T 项在 b→bCrit 处对数发散，指数尾项远场快速衰减
+          // [FIT] 强场偏折拟合：0.22453/7.77209/1.57784 与尾速 2.0、窗口 (-0.25,0.15)、bSafe 下限 0.6rs、
+          // logArg 下限 0.02（饱和 b→bCrit 的对数发散，勿删）共生；目标 α(b)=2∫₀^u_max du/√(1/b²-u²+u³)−π，
+          // b∈[2.8,13] 残差 <0.08 rad。禁单项手调，重拟合后整组替换
           float inWeight = 1.0 - smoothstep(-0.25, 0.15, cosRayAngle0);
           float logArg = max(1.0 - bCrit / bSafe, 0.02);
           float strongTail = exp(-max(0.0, bSafe - bCrit) * 2.0);
@@ -619,23 +693,164 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
           float uAlong = dot(scaledUV, diskAxis2D);
           float uPerp  = dot(scaledUV, diskNorm2D);
 
+          // [ART] 各向异条纹 17.5 / 2.6（纵横衰减比约 6.7:1 的拉丝）与柔纱 4.8 / 0.025 均为视觉调参
           float anamorphicStreak = exp(-abs(uPerp) * 17.5 - abs(uAlong) * 2.6);
           float softVeil = exp(-dot(scaledUV, scaledUV) * 4.8) * 0.025;
           accumColor += vec3(1.0, 0.86, 0.68) * (anamorphicStreak * 0.040 + softVeil) * uGlow * uBloom;
         }
 
-        // ACES 近似色调映射与 Gamma 校正
-        accumColor = (accumColor * (2.51 * accumColor + 0.03)) / (accumColor * (2.43 * accumColor + 0.59) + 0.14);
-        accumColor = pow(clamp(accumColor, 0.0, 1.0), vec3(0.454545));
+        // 色调映射与抖动已移至 present pass：HDR 场景缓冲下泛光叠加与放大滤波都应在
+        // 线性空间完成，最后再 ACES + Gamma。仅当浮点缓冲不可用（uHdrScene=0）时退化为
+        // 原位映射，避免把线性高光写进 8 位。五个常数 2.51/0.03/2.43/0.59/0.14 与
+        // Gamma 1/2.2 = 0.454545 为已发表标准值 [EXACT 出处固定，禁改]
+        if (uHdrScene < 0.5) {
+          accumColor = (accumColor * (2.51 * accumColor + 0.03)) / (accumColor * (2.43 * accumColor + 0.59) + 0.14);
+          accumColor = pow(clamp(accumColor, 0.0, 1.0), vec3(0.454545));
+          // 8 位回退路径：本 pass 直接写 RGBA8 中间缓冲，带纹在此已定死，present 端抖动救不回，
+          // 故此处须自行抖动。常数与 present 端同源（IGN 标准常数，禁改）；present 端仍会再抖一次，
+          // 只在此回退分支下叠加，可接受
+          float md1 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+          float md2 = fract(52.9829189 * fract(dot(gl_FragCoord.xy + vec2(17.0, 31.0), vec2(0.06711056, 0.00583715))));
+          accumColor += (md1 - md2) * (1.0 / 255.0);
+        }
 
-        // 三角分布抖动打散色带
+        fragColor = vec4(accumColor, 1.0);
+      }
+`,kt=`#version 300 es
+      // shaders/present.frag.glsl —— 离屏场景纹理 → 原生画布的合成滤波 + 泛光叠加 + 色调映射
+      // 画布缓冲恒为设备像素数，浏览器不再参与缩放；倍率间的缩放全部由这里决定。
+      // 放大端（uScale < 1，如 0.95x）恒用 3x3 Catmull-Rom；缩小端由 uDownSharp 选择：
+      //   1 = Catmull-Rom：与 1.0x 的锐度更一致（默认）
+      //   0 = 2x2 双线性：预滤更强、动起来星点更稳，但比 1.0x 明显软
+      // 1.0 档（uScale.x = 1）时条件 uScale.x <= 1.0 短路，恒走 CR 分支；此时 f=0，四个权重
+      // 退化为 (0,1,0,0)，取值即原像素，成恒等（双线性分支不进入）
+      // 两种滤波都无法把非 1.0x 档做成无损：源像素数不同，1.0x 仍是最锐的点
+      // uHdr=1：场景为线性 HDR，泛光在线性空间叠加后 ACES+Gamma+抖动；0：场景已映射，仅叠加泛光
+      precision highp float;
+      precision highp int;
+      precision highp sampler2D;
+      out vec4 fragColor;
+
+      uniform sampler2D uScene;
+      uniform sampler2D uBloom0;
+      uniform sampler2D uBloom1;
+      uniform sampler2D uBloom2;
+      uniform vec2 uSrcSize;
+      uniform vec2 uScale;
+      uniform float uDownSharp;
+      uniform float uBloomStrength;
+      uniform float uHdr;
+
+      // Catmull-Rom（B=0, C=0.5）一维权重，t 取 [0,1)
+      vec4 crWeights(float t) {
+        float t2 = t * t;
+        float t3 = t2 * t;
+        return vec4(
+          -0.5 * t3 + t2 - 0.5 * t,
+           1.5 * t3 - 2.5 * t2 + 1.0,
+          -1.5 * t3 + 2.0 * t2 + 0.5 * t,
+           0.5 * t3 - 0.5 * t2
+        );
+      }
+
+      vec3 fetchScene(vec2 idx) {
+        return texelFetch(uScene, ivec2(idx), 0).rgb;
+      }
+
+      // ACES 近似；五个常数 2.51/0.03/2.43/0.59/0.14 为已发表标准值 [EXACT 出处固定，禁改]
+      vec3 aces(vec3 x) {
+        return (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
+      }
+
+      void main() {
+        vec2 src = gl_FragCoord.xy * uScale - 0.5;
+        vec2 base = floor(src);
+        vec2 f = src - base;
+        vec2 maxIdx = uSrcSize - 1.0;
+
+        vec3 sceneCol;
+        if (uScale.x <= 1.0 || uDownSharp > 0.5) {
+          vec4 wx = crWeights(f.x);
+          vec4 wy = crWeights(f.y);
+          vec3 accum = vec3(0.0);
+          for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 4; i++) {
+              vec2 idx = clamp(base + vec2(float(i - 1), float(j - 1)), vec2(0.0), maxIdx);
+              accum += fetchScene(idx) * (wx[i] * wy[j]);
+            }
+          }
+          sceneCol = max(accum, vec3(0.0));
+        } else {
+          vec2 idx0 = clamp(base, vec2(0.0), maxIdx);
+          vec2 idx1 = clamp(base + 1.0, vec2(0.0), maxIdx);
+          vec3 top = mix(fetchScene(vec2(idx0.x, idx0.y)), fetchScene(vec2(idx1.x, idx0.y)), f.x);
+          vec3 bottom = mix(fetchScene(vec2(idx0.x, idx1.y)), fetchScene(vec2(idx1.x, idx1.y)), f.x);
+          sceneCol = mix(top, bottom, f.y);
+        }
+
+        // 泛光贴图覆盖整屏，采样 uv 必须是场景的归一化屏幕坐标（= 画布归一化），
+        // 即 gl_FragCoord * uScale / uSrcSize；三级分辨率不同但覆盖范围一致，共用一个 uv
+        if (uBloomStrength > 0.0001) {
+          vec2 bloomUV = gl_FragCoord.xy * uScale / uSrcSize;
+          vec3 bloom = texture(uBloom0, bloomUV).rgb * 0.85
+                     + texture(uBloom1, bloomUV).rgb * 0.55
+                     + texture(uBloom2, bloomUV).rgb * 0.38;
+          sceneCol += bloom * uBloomStrength;
+        }
+
+        vec3 col;
+        if (uHdr > 0.5) {
+          col = pow(clamp(aces(sceneCol), 0.0, 1.0), vec3(0.454545));
+        } else {
+          // 场景已在主程序内映射到 LDR，此处只叠加泛光并夹取
+          col = clamp(sceneCol, 0.0, 1.0);
+        }
+
+        // 三角分布抖动打散色带：52.9829189 与 (0.06711056, 0.00583715) 为 interleaved gradient
+        // noise 标准常数 [EXACT 出处固定，禁改]；两采样错位 (17,31) 形成三角分布 [ART]
         float d1 = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
         float d2 = fract(52.9829189 * fract(dot(gl_FragCoord.xy + vec2(17.0, 31.0), vec2(0.06711056, 0.00583715))));
-        accumColor += (d1 - d2) * (1.0 / 255.0);
+        col += (d1 - d2) * (1.0 / 255.0);
 
-        gl_FragColor = vec4(accumColor, 1.0);
+        fragColor = vec4(col, 1.0);
       }
-`,P=Be(e,ot,at,"bake"),d=Be(e,rt,it,"main"),st=new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),He=e.createBuffer();e.bindBuffer(e.ARRAY_BUFFER,He);e.bufferData(e.ARRAY_BUFFER,st,e.STATIC_DRAW);const Oe=nt(e,512),Se=512,Re=256;function Ne(t){const n=e.getExtension("OES_texture_half_float"),a=e.getExtension("OES_texture_half_float_linear"),r=e.createFramebuffer();e.bindFramebuffer(e.FRAMEBUFFER,r);function s(m){const f=e.createTexture();e.bindTexture(e.TEXTURE_CUBE_MAP,f),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_MAG_FILTER,e.LINEAR);for(let l=0;l<6;l++)e.texImage2D(e.TEXTURE_CUBE_MAP_POSITIVE_X+l,0,e.RGBA,t,t,0,e.RGBA,m,null);return e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X,f,0),e.checkFramebufferStatus(e.FRAMEBUFFER)===e.FRAMEBUFFER_COMPLETE?f:(e.deleteTexture(f),null)}let h=null;return n&&a&&(h=s(n.HALF_FLOAT_OES)),h||(h=s(e.UNSIGNED_BYTE)),e.bindFramebuffer(e.FRAMEBUFFER,null),{tex:h,fbo:r}}const be=Ne(Se),xe=Ne(Re),D={aPosition:e.getAttribLocation(P,"aPosition"),uFace:e.getUniformLocation(P,"uFace"),uPass:e.getUniformLocation(P,"uPass"),uGalUp:e.getUniformLocation(P,"uGalUp"),uGalRight:e.getUniformLocation(P,"uGalRight"),uGalForward:e.getUniformLocation(P,"uGalForward"),uCloudDir1:e.getUniformLocation(P,"uCloudDir1"),uCloudDir2:e.getUniformLocation(P,"uCloudDir2"),uCloudDir3:e.getUniformLocation(P,"uCloudDir3"),uCosmosSeed:e.getUniformLocation(P,"uCosmosSeed"),uNoiseTex:e.getUniformLocation(P,"uNoiseTex")};e.useProgram(d);const ze=e.getAttribLocation(d,"aPosition");e.enableVertexAttribArray(ze);e.vertexAttribPointer(ze,2,e.FLOAT,!1,0,0);const v={uResolution:e.getUniformLocation(d,"uResolution"),uInvMinDim:e.getUniformLocation(d,"uInvMinDim"),uResSharp:e.getUniformLocation(d,"uResSharp"),uTime:e.getUniformLocation(d,"uTime"),uCamPos:e.getUniformLocation(d,"uCamPos"),uCamR0:e.getUniformLocation(d,"uCamR0"),uCamForward:e.getUniformLocation(d,"uCamForward"),uCamRight:e.getUniformLocation(d,"uCamRight"),uCamUp:e.getUniformLocation(d,"uCamUp"),uGlow:e.getUniformLocation(d,"uGlow"),uDoppler:e.getUniformLocation(d,"uDoppler"),uTemp:e.getUniformLocation(d,"uTemp"),uCosmos:e.getUniformLocation(d,"uCosmos"),uBloom:e.getUniformLocation(d,"uBloom"),uSpeed:e.getUniformLocation(d,"uSpeed"),uTwinkle:e.getUniformLocation(d,"uTwinkle"),uLegacyShadow:e.getUniformLocation(d,"uLegacyShadow"),uPhotonRing:e.getUniformLocation(d,"uPhotonRing"),uBloomBasis:e.getUniformLocation(d,"uBloomBasis"),uStarShift1:e.getUniformLocation(d,"uStarShift1"),uStarShift2:e.getUniformLocation(d,"uStarShift2"),uStarShift3:e.getUniformLocation(d,"uStarShift3"),uStarShift4:e.getUniformLocation(d,"uStarShift4"),uStarShift5:e.getUniformLocation(d,"uStarShift5"),uNoiseTex:e.getUniformLocation(d,"uNoiseTex"),uNebulaCube0:e.getUniformLocation(d,"uNebulaCube0"),uNebulaCube1:e.getUniformLocation(d,"uNebulaCube1")};e.activeTexture(e.TEXTURE0);e.bindTexture(e.TEXTURE_2D,Oe);e.uniform1i(v.uNoiseTex,0);e.activeTexture(e.TEXTURE1);e.bindTexture(e.TEXTURE_CUBE_MAP,be.tex);e.uniform1i(v.uNebulaCube0,1);e.activeTexture(e.TEXTURE2);e.bindTexture(e.TEXTURE_CUBE_MAP,xe.tex);e.uniform1i(v.uNebulaCube1,2);const F=new Float32Array(3),Xe=new Float32Array(3),qe=new Float32Array(3),Ge=new Float32Array(3),Ye=new Float32Array(3),Ve=new Float32Array(3),re=new Float32Array(4),J=new Float32Array(3);function lt(t,n,a,r){const s=Math.hypot(n,a,r)||1;t[0]=n/s,t[1]=a/s,t[2]=r/s}function ct(t,n,a){t[0]=n[1]*a[2]-n[2]*a[1],t[1]=n[2]*a[0]-n[0]*a[2],t[2]=n[0]*a[1]-n[1]*a[0]}function Q(t){const n=Math.random()*2-1,a=Math.random()*Math.PI*2,r=Math.sqrt(Math.max(0,1-n*n));t[0]=r*Math.cos(a),t[1]=n,t[2]=r*Math.sin(a)}function ut(){e.useProgram(P),e.bindBuffer(e.ARRAY_BUFFER,He),e.enableVertexAttribArray(D.aPosition),e.vertexAttribPointer(D.aPosition,2,e.FLOAT,!1,0,0),e.activeTexture(e.TEXTURE0),e.bindTexture(e.TEXTURE_2D,Oe),e.uniform1i(D.uNoiseTex,0),e.uniform3fv(D.uGalUp,F),e.uniform3fv(D.uGalRight,Xe),e.uniform3fv(D.uGalForward,qe),e.uniform3fv(D.uCloudDir1,Ge),e.uniform3fv(D.uCloudDir2,Ye),e.uniform3fv(D.uCloudDir3,Ve),e.uniform4fv(D.uCosmosSeed,re),e.bindFramebuffer(e.FRAMEBUFFER,be.fbo),e.viewport(0,0,Se,Se),e.uniform1i(D.uPass,0);for(let t=0;t<6;t++)e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X+t,be.tex,0),e.uniform1i(D.uFace,t),e.drawArrays(e.TRIANGLES,0,6);e.bindFramebuffer(e.FRAMEBUFFER,xe.fbo),e.viewport(0,0,Re,Re),e.uniform1i(D.uPass,1);for(let t=0;t<6;t++)e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X+t,xe.tex,0),e.uniform1i(D.uFace,t),e.drawArrays(e.TRIANGLES,0,6);e.bindFramebuffer(e.FRAMEBUFFER,null),S.width>0&&S.height>0&&e.viewport(0,0,S.width,S.height),e.useProgram(d)}function We(){Q(F);const t=Math.abs(F[1])<.85?0:1,n=Math.abs(F[1])<.85?1:0,a=[n*F[2],-t*F[2],t*F[1]-n*F[0]];lt(a,a[0],a[1],a[2]);const r=[0,0,0];ct(r,F,a);const s=Math.random()*Math.PI*2,h=Math.cos(s),m=Math.sin(s);for(let u=0;u<3;u++)Xe[u]=h*a[u]+m*r[u],qe[u]=-m*a[u]+h*r[u];Q(Ge),Q(Ye),Q(Ve);for(let u=0;u<4;u++)re[u]=Math.random()*100;for(let u=0;u<3;u++)J[u]=(Math.random()-.5)*400;ut();const f=J[0],p=J[1],l=J[2];e.uniform3f(v.uStarShift1,f*1.73,p*1.73,l*1.73),e.uniform3f(v.uStarShift2,f*1.31,p*1.31,l*1.31),e.uniform3f(v.uStarShift3,f,p,l),e.uniform3f(v.uStarShift4,f*.67,p*.67,l*.67),e.uniform3f(v.uStarShift5,f*.37,p*.37,l*.37);const g=Math.floor((re[0]*4096+re[1]*256)%65535).toString(16).toUpperCase().padStart(4,"0"),c=document.getElementById("tel-seed");c&&(c.textContent=`#${g}`)}const i={yaw:.42,pitch:.142,rollDeg:-10,zoomScale:1,glow:1.22,doppler:1,temp:1,cosmos:1.05,bloom:.8,speed:1,twinkle:1,renderScale:1.2,autoDRS:!0,autoRotate:!0,legacyShadow:!1,photonRing:!1},Ze=13.2,z=Math.PI*2,Ie=.0055,dt=.0012,mt=.065;function Ae(t,n){let a=(n-t)%z;return a>Math.PI&&(a-=z),a<-Math.PI&&(a+=z),a}function ue(t){let n=t%z;return n>Math.PI&&(n-=z),n<-Math.PI&&(n+=z),n}const o={yaw:i.yaw,pitch:i.pitch,rollDeg:i.rollDeg,zoomScale:i.zoomScale,targetYaw:i.yaw,targetPitch:i.pitch,targetRollDeg:i.rollDeg,targetZoomScale:i.zoomScale,autoRotate:i.autoRotate,autoDRS:i.autoDRS,renderScale:i.renderScale,glow:i.glow,doppler:i.doppler,temp:i.temp,cosmos:i.cosmos,bloom:i.bloom,speed:i.speed,twinkle:i.twinkle,legacyShadow:i.legacyShadow,photonRing:i.photonRing,uniformsDirty:!0};function Ke(){o.uniformsDirty&&(e.uniform1f(v.uGlow,o.glow),e.uniform1f(v.uDoppler,o.doppler),e.uniform1f(v.uTemp,o.temp),e.uniform1f(v.uCosmos,o.cosmos),e.uniform1f(v.uBloom,o.bloom),e.uniform1f(v.uSpeed,o.speed),e.uniform1f(v.uTwinkle,o.twinkle),e.uniform1f(v.uLegacyShadow,o.legacyShadow?1:0),e.uniform1f(v.uPhotonRing,o.photonRing?1:0),o.uniformsDirty=!1)}const ee=new Float32Array(3),te=new Float32Array(3),H=new Float32Array(3),O=new Float32Array(3),ne=new Float32Array(3);let me=null;function ft(){return me||(me=document.getElementById("tel-res")),me}function Z(){const t=Math.max(1,S.clientWidth||window.innerWidth),n=Math.max(1,S.clientHeight||window.innerHeight),a=Math.min(window.devicePixelRatio||1,1.5),r=280/Math.min(t,n),s=Math.max(r,a*o.renderScale),h=Math.round(t*s),m=Math.round(n*s);if(S.width!==h||S.height!==m){S.width=h,S.height=m,e.viewport(0,0,S.width,S.height);const f=Math.min(S.width,S.height),p=f/850,l=Math.min(30,Math.max(.15,p*p));e.uniform2f(v.uResolution,S.width,S.height),e.uniform1f(v.uInvMinDim,1/f),e.uniform1f(v.uResSharp,l);const g=ft();g&&(g.textContent=`${S.width}×${S.height} (${o.renderScale.toFixed(2)}x)`)}}const pt=document.getElementById("slider-zoom"),ht=document.getElementById("val-zoom");function X(t){o.targetZoomScale=Math.max(.1,Math.min(2.5,t)),pt.value=o.targetZoomScale.toFixed(2),ht.textContent=o.targetZoomScale.toFixed(2)+"x"}function $e(t,n,a){o.yaw=ue(o.yaw),o.pitch=ue(o.pitch),o.targetYaw=o.yaw+Ae(o.yaw,t),o.targetPitch=o.pitch+Ae(o.pitch,n),o.targetRollDeg=a}let I=!1,M=0,k=0;function Fe(t,n){const a=o.rollDeg*Math.PI/180,r=Math.cos(a),s=Math.sin(a),h=r*t+s*n,m=-s*t+r*n,f=Math.cos(o.targetPitch)>=0?1:-1;o.targetYaw-=h*Ie*f,o.targetPitch+=m*Ie,B()}const ye=document.querySelectorAll(".preset-btn");function B(){ye.forEach(t=>t.classList.remove("active"))}let _e=!1;function gt(){if(_e)return;_e=!0,S.addEventListener("mousedown",n=>{I=!0,M=n.clientX,k=n.clientY}),window.addEventListener("mousemove",n=>{if(!I)return;const a=n.clientX-M,r=n.clientY-k;M=n.clientX,k=n.clientY,Fe(a,r)}),window.addEventListener("mouseup",()=>{I=!1}),S.addEventListener("wheel",n=>{n.preventDefault();const a=Math.exp(-n.deltaY*dt);X(o.targetZoomScale*a),B()},{passive:!1});let t=0;S.addEventListener("touchstart",n=>{n.preventDefault(),n.touches.length===1?(I=!0,M=n.touches[0].clientX,k=n.touches[0].clientY):n.touches.length>=2&&(I=!1,t=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY))},{passive:!1}),S.addEventListener("touchmove",n=>{if(n.preventDefault(),I&&n.touches.length===1){const a=n.touches[0].clientX-M,r=n.touches[0].clientY-k;M=n.touches[0].clientX,k=n.touches[0].clientY,Fe(a,r)}else if(n.touches.length>=2){const a=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY);t>0&&(X(o.targetZoomScale*(a/t)),B()),t=a}},{passive:!1}),S.addEventListener("touchend",n=>{n.touches.length===0?(I=!1,t=0):n.touches.length===1&&(t=0,I=!0,M=n.touches[0].clientX,k=n.touches[0].clientY)},{passive:!1}),window.addEventListener("gesturestart",n=>n.preventDefault(),{passive:!1}),window.addEventListener("gesturechange",n=>n.preventDefault(),{passive:!1}),window.addEventListener("gestureend",n=>n.preventDefault(),{passive:!1}),ye.forEach(n=>{n.addEventListener("click",()=>{B(),n.classList.add("active");const a=ue(o.yaw);$e(a,parseFloat(n.dataset.pitch),parseFloat(n.dataset.roll)),X(parseFloat(n.dataset.scale)),document.getElementById("slider-roll").value=o.targetRollDeg,document.getElementById("val-roll").textContent=`${Math.round(o.targetRollDeg)}°`})})}const T={zh:{langBtn:"EN",headerTitle:"Gargantua // 卡冈都亚",controlsTitle:"时空光学控制",telFps:"实时帧率",telDist:"视界距离",telRsh:"光子环Rc",telInc:"轨道姿态",telRes:"渲染缓冲",telSeed:"星域序列",preset1:"经典卡冈都亚",preset2:"掠射赤道 88°",preset3:"极轴俯瞰 90°",lblZoom:"视界尺度",lblGlow:"吸积盘光度",lblDoppler:"多普勒集束",lblTemp:"黑体色温",lblCosmos:"星尘丰度",lblTwinkle:"星光闪烁",lblBloom:"镜头眩光",lblSpeed:"轨道角速",lblRoll:"镜头倾角",lblScale:"超采样率",drsOn:"自适应满帧: 开",drsOff:"自适应满帧: 关",cruiseOn:"轨道巡航: 开",cruiseOff:"轨道巡航: 关",legacyShadow:"旧版黑洞",photonRing:"光子环",randomCosmos:"随机星域",resetAll:"全部重置",hideHud:"隐藏界面 (H)",showHud:"显示界面 (H)",hideHudShort:"隐藏",showHudShort:"显示",btnLandscape:"横屏",btnPortrait:"竖屏"},en:{langBtn:"FR",headerTitle:"Gargantua // Deep Space Optics",controlsTitle:"Spacetime Optics",telFps:"Frame Rate",telDist:"Horizon Distance",telRsh:"Photon Ring Rc",telInc:"Orbit Attitude",telRes:"Render Buffer",telSeed:"Cosmos Seed",preset1:"Classic",preset2:"Equator 88°",preset3:"Polar 90°",lblZoom:"Horizon Scale",lblGlow:"Disk Luminosity",lblDoppler:"Doppler Beaming",lblTemp:"Planck Temp",lblCosmos:"Stardust Density",lblTwinkle:"Star Twinkle",lblBloom:"Lens Bloom",lblSpeed:"Orbital Spin",lblRoll:"Camera Roll",lblScale:"Render Scale",drsOn:"DRS: ON",drsOff:"DRS: OFF",cruiseOn:"Cruise: ON",cruiseOff:"Cruise: OFF",legacyShadow:"Legacy Shadow",photonRing:"Photon Ring",randomCosmos:"Random Cosmos",resetAll:"Reset All",hideHud:"Hide HUD (H)",showHud:"Show HUD (H)",hideHudShort:"Hide",showHudShort:"Show",btnLandscape:"Rotate",btnPortrait:"Portrait"},fr:{langBtn:"LA",headerTitle:"Gargantua // Optique Spatiale",controlsTitle:"Optique Spatiale",telFps:"Images / s",telDist:"Distance Horizon",telRsh:"Anneau Photon Rc",telInc:"Attitude Orbitale",telRes:"Tampon de Rendu",telSeed:"Graine Cosmique",preset1:"Classique",preset2:"Équateur 88°",preset3:"Polaire 90°",lblZoom:"Échelle d’Horizon",lblGlow:"Luminosité Disque",lblDoppler:"Faisceau Doppler",lblTemp:"Temp. de Planck",lblCosmos:"Densité Poussière",lblTwinkle:"Scintillement",lblBloom:"Éclat Optique",lblSpeed:"Vitesse Orbitale",lblRoll:"Roulis Caméra",lblScale:"Suréchantillonnage",drsOn:"DRS: ACTIF",drsOff:"DRS: INACTIF",cruiseOn:"Croisière: ON",cruiseOff:"Croisière: OFF",legacyShadow:"Ombre Rétro",photonRing:"Anneau Photon",randomCosmos:"Cosmos Aléat.",resetAll:"Rétablir",hideHud:"Masquer HUD (H)",showHud:"Afficher HUD (H)",hideHudShort:"Masquer",showHudShort:"Afficher",btnLandscape:"Paysage",btnPortrait:"Portrait"},la:{langBtn:"中文",headerTitle:"Gargantua // Optica Relativistica",controlsTitle:"Optica Spatiotemporis",telFps:"Frequentia FPS",telDist:"Distantia Horizontis",telRsh:"Anulus Photonum Rc",telInc:"Habitus Orbitae",telRes:"Memoria Reditionis",telSeed:"Semen Cosmici",preset1:"Classicus",preset2:"Aequator 88°",preset3:"Polaris 90°",lblZoom:"Magnitudo Horizontis",lblGlow:"Luminositas Disci",lblDoppler:"Fasciculus Doppler",lblTemp:"Temp. Planckiana",lblCosmos:"Densitas Stellaris",lblTwinkle:"Scintillatio",lblBloom:"Effulgentia Lentis",lblSpeed:"Velocitas Orbitae",lblRoll:"Inclinatio Camerae",lblScale:"Gradus Reditionis",drsOn:"DRS: ACTUM",drsOff:"DRS: CLAUSUM",cruiseOn:"Cursus: ON",cruiseOff:"Cursus: OFF",legacyShadow:"Umbra Vetus",photonRing:"Anulus Photonum",randomCosmos:"Cosmos Novus",resetAll:"Restituere",hideHud:"Occultare HUD (H)",showHud:"Monstrare HUD (H)",hideHudShort:"Occultare",showHudShort:"Monstrare",btnLandscape:"In Latus",btnPortrait:"Rectum"}},ie=["zh","en","fr","la"];let R="zh";try{const t=localStorage.getItem("gargantua_lang");ie.includes(t)&&(R=t)}catch{}const je=[];function vt(t){je.push(t)}function St(){for(const t of je)t()}function Je(t){if(!T[t])return;R=t;const n={zh:"zh-CN",en:"en",fr:"fr",la:"la"};document.documentElement.lang=n[t]||t,document.querySelectorAll("[data-i18n]").forEach(a=>{const r=a.getAttribute("data-i18n");T[R]&&T[R][r]&&(a.textContent=T[R][r])}),St();try{localStorage.setItem("gargantua_lang",R)}catch{}}function Ue(){const t=ie.indexOf(R),n=ie[(t+1)%ie.length];Je(n)}const fe=document.getElementById("tel-fps"),Rt=document.getElementById("tel-dist"),bt=document.getElementById("tel-rsh"),xt=document.getElementById("tel-inc");function de(){const t=Ze/o.zoomScale;Rt.textContent=`${o.zoomScale.toFixed(2)}x (${t.toFixed(1)} Rs)`,bt.textContent=`${(2.598*o.zoomScale).toFixed(2)} Rs`;const n=((o.pitch*180/Math.PI+180)%360+360)%360-180,a=(o.yaw*180/Math.PI%360+360)%360,r=n>=0?"+":"";xt.textContent=`${r}${n.toFixed(1)}° / ${Math.round(a)}°`}const se=document.getElementById("btn-toggle-hud"),W=document.getElementById("btn-landscape"),G=document.getElementById("btn-drs"),le=document.getElementById("btn-autorotate"),oe=document.getElementById("btn-lang");function ae(){G.textContent=o.autoDRS?T[R].drsOn:T[R].drsOff}function pe(){le.textContent=o.autoRotate?T[R].cruiseOn:T[R].cruiseOff}function Qe(){const t=document.body.classList.contains("hud-hidden"),n=t?T[R].showHud:T[R].hideHud,a=t?T[R].showHudShort:T[R].hideHudShort,r=se.querySelector(".hud-text-full"),s=se.querySelector(".hud-text-short");r&&s?(r.textContent=n,s.textContent=a):se.textContent=n}function Y(){if(!W)return;const t=window.innerWidth>window.innerHeight,n=!!(document.fullscreenElement||document.webkitFullscreenElement),a=t||n;W.textContent=a?T[R].btnPortrait:T[R].btnLandscape,W.title=a?R==="zh"?"切换至竖屏":"Switch to Portrait":R==="zh"?"切换至横屏":"Switch to Landscape"}async function wt(){const t=window.innerWidth>window.innerHeight,n=!!(document.fullscreenElement||document.webkitFullscreenElement);if(!t||!n){try{const a=document.documentElement,r=a.requestFullscreen||a.webkitRequestFullscreen||a.mozRequestFullScreen||a.msRequestFullscreen;r&&!n&&await r.call(a),document.body.classList.add("fullscreen-landscape")}catch{}try{screen.orientation&&screen.orientation.lock&&await screen.orientation.lock("landscape")}catch{}}else{document.body.classList.remove("fullscreen-landscape");try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch{}try{const a=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen;a&&n&&await a.call(document)}catch{}}setTimeout(Y,150)}function Me(){document.body.classList.toggle("hud-hidden"),Qe()}let ke=!1;function Et(){if(ke)return;ke=!0,se.addEventListener("click",Me),W&&W.addEventListener("click",wt);function t(){!document.fullscreenElement&&!document.webkitFullscreenElement&&document.body.classList.remove("fullscreen-landscape"),Y()}document.addEventListener("fullscreenchange",t),document.addEventListener("webkitfullscreenchange",t),window.screen&&window.screen.orientation&&window.screen.orientation.addEventListener("change",Y),window.addEventListener("resize",Y),oe&&oe.addEventListener("click",Ue),window.addEventListener("keydown",c=>{c.target&&(c.target.tagName==="INPUT"||c.target.tagName==="TEXTAREA")||((c.key==="h"||c.key==="H")&&Me(),(c.key==="l"||c.key==="L")&&Ue())}),document.getElementById("slider-scale"),document.getElementById("val-scale");const n=document.getElementById("slider-zoom");n.addEventListener("input",()=>{X(parseFloat(n.value)),B()});const a=document.getElementById("slider-roll"),r=document.getElementById("val-roll");a.addEventListener("input",()=>{o.targetRollDeg=parseFloat(a.value),r.textContent=`${Math.round(o.targetRollDeg)}°`,B()});function s(c,u,x,y=""){const b=document.getElementById(c),w=document.getElementById(u);b.addEventListener("input",()=>{o[x]=parseFloat(b.value),w.textContent=o[x].toFixed(2)+y,x==="renderScale"?(o.autoDRS=!1,G.classList.remove("active"),ae(),Z()):o.uniformsDirty=!0,de()})}s("slider-glow","val-glow","glow"),s("slider-doppler","val-doppler","doppler"),s("slider-temp","val-temp","temp"),s("slider-cosmos","val-cosmos","cosmos"),s("slider-bloom","val-bloom","bloom"),s("slider-speed","val-speed","speed"),s("slider-twinkle","val-twinkle","twinkle"),s("slider-scale","val-scale","renderScale","x"),X(o.zoomScale),a.value=o.targetRollDeg,r.textContent=`${Math.round(o.targetRollDeg)}°`;for(const[c,u,x,y]of[["slider-glow","val-glow","glow",""],["slider-doppler","val-doppler","doppler",""],["slider-temp","val-temp","temp",""],["slider-cosmos","val-cosmos","cosmos",""],["slider-bloom","val-bloom","bloom",""],["slider-speed","val-speed","speed",""],["slider-twinkle","val-twinkle","twinkle",""],["slider-scale","val-scale","renderScale","x"]])document.getElementById(c).value=o[x],document.getElementById(u).textContent=o[x].toFixed(2)+y;G.addEventListener("click",()=>{o.autoDRS=!o.autoDRS,G.classList.toggle("active",o.autoDRS),ae()}),le.addEventListener("click",()=>{o.autoRotate=!o.autoRotate,le.classList.toggle("active",o.autoRotate),pe()});const h=document.getElementById("btn-legacy-shadow"),m=document.getElementById("btn-photonring-toggle");function f(c){o.legacyShadow=c,c&&o.photonRing&&(o.photonRing=!1,m.classList.remove("active")),o.uniformsDirty=!0,h.classList.toggle("active",o.legacyShadow)}function p(c){o.photonRing=c,c&&o.legacyShadow&&(o.legacyShadow=!1,h.classList.remove("active")),o.uniformsDirty=!0,m.classList.toggle("active",o.photonRing)}h.addEventListener("click",()=>{f(!o.legacyShadow)}),m.addEventListener("click",()=>{p(!o.photonRing)}),document.getElementById("btn-random-cosmos").addEventListener("click",()=>{We()}),document.getElementById("btn-reset").addEventListener("click",()=>{$e(i.yaw,i.pitch,i.rollDeg),X(i.zoomScale),o.glow=i.glow,o.doppler=i.doppler,o.temp=i.temp,o.cosmos=i.cosmos,o.bloom=i.bloom,o.speed=i.speed,o.twinkle=i.twinkle,o.renderScale=i.renderScale,o.autoDRS=i.autoDRS,o.autoRotate=i.autoRotate,o.legacyShadow=i.legacyShadow,o.photonRing=i.photonRing,o.uniformsDirty=!0,h.classList.remove("active"),m.classList.remove("active"),a.value=i.rollDeg,r.textContent=`${Math.round(i.rollDeg)}°`,G.classList.add("active"),le.classList.add("active"),ae(),pe(),B(),ye[0].classList.add("active");const c=[["slider-glow","val-glow",i.glow,""],["slider-doppler","val-doppler",i.doppler,""],["slider-temp","val-temp",i.temp,""],["slider-cosmos","val-cosmos",i.cosmos,""],["slider-bloom","val-bloom",i.bloom,""],["slider-speed","val-speed",i.speed,""],["slider-twinkle","val-twinkle",i.twinkle,""],["slider-scale","val-scale",i.renderScale,"x"]];for(const[u,x,y,b]of c)document.getElementById(u).value=y,document.getElementById(x).textContent=y.toFixed(2)+b;Z(),de()}),vt(()=>{ae(),pe(),Qe(),Y(),oe&&(oe.textContent=T[R].langBtn),g()});const l=document.querySelector(".controls");function g(){if(!l)return;const c=l.scrollHeight-l.clientHeight>4,u=l.scrollTop<4,x=l.scrollHeight-l.scrollTop-l.clientHeight<4;l.classList.toggle("show-fade",c&&!x),l.classList.toggle("show-fade-top",c&&!u)}l&&(l.addEventListener("scroll",g,{passive:!0}),window.addEventListener("resize",g),l.addEventListener("pointerdown",()=>l.classList.add("pressing")),window.addEventListener("pointerup",()=>l.classList.remove("pressing")),window.addEventListener("pointercancel",()=>l.classList.remove("pressing")),requestAnimationFrame(g),setTimeout(g,300))}const yt=document.getElementById("slider-scale"),Tt=document.getElementById("val-scale"),he=document.getElementById("fps-mini");gt();Et();We();window.addEventListener("resize",Z);Z();Ke();let ge=0,we=performance.now(),V=0,N=0,ce=0,Ee=!0,ve=null;function Te(){ve!==null&&cancelAnimationFrame(ve),ve=requestAnimationFrame(Dt)}document.addEventListener("visibilitychange",()=>{Ee=!document.hidden,Ee&&(we=performance.now(),V=0,N=0,ce=0,Te())});function Dt(t){if(!Ee)return;const n=Math.min(.1,(t-we)*.001);if(we=t,ge=(ge+n)%36e3,V++,N+=n,ce+=n,N>=.5){const E=Math.round(V/N),_=(N/V*1e3).toFixed(1);if(fe.textContent=`${E} FPS (${_} ms)`,fe.style.color=E>=52?"#68d8a6":E>=32?"#e5c89b":"#ff6b6b",he&&(he.textContent=`${E}`,he.style.color=fe.style.color),o.autoDRS){let C=o.renderScale;E<54&&o.renderScale>.6?C=Math.max(.6,o.renderScale-.06):E>=58&&o.renderScale<1.3&&(C=Math.min(1.3,o.renderScale+.05)),Math.abs(C-o.renderScale)>.01&&(o.renderScale=C,yt.value=C.toFixed(2),Tt.textContent=C.toFixed(2)+"x",Z())}V=0,N=0}if(o.autoRotate&&!I){const E=Math.cos(o.targetPitch)>=0?1:-1;o.targetYaw+=mt*n*E}const a=1-Math.exp(-9.5*n);o.yaw+=(o.targetYaw-o.yaw)*a,o.pitch+=(o.targetPitch-o.pitch)*a,o.rollDeg+=(o.targetRollDeg-o.rollDeg)*a,o.zoomScale+=(o.targetZoomScale-o.zoomScale)*a,!I&&Math.abs(o.targetYaw-o.yaw)<1e-4&&(o.yaw=ue(o.yaw),o.targetYaw=o.yaw),ce>=.25&&(de(),ce=0);const r=Ze/o.zoomScale,s=Math.cos(o.pitch),h=Math.sin(o.pitch),m=Math.cos(o.yaw),f=Math.sin(o.yaw);ee[0]=r*s*f,ee[1]=r*h,ee[2]=r*s*m,te[0]=-s*f,te[1]=-h,te[2]=-s*m;const p=m,l=0,g=-f,c=-h*f,u=s,x=-h*m,y=o.rollDeg*Math.PI/180,b=Math.cos(y),w=Math.sin(y);H[0]=b*p-w*c,H[1]=b*l-w*u,H[2]=b*g-w*x,O[0]=w*p+b*c,O[1]=w*l+b*u,O[2]=w*g+b*x;const L=Math.hypot(H[1],O[1]);ne[0]=L>1e-4?H[1]/L:0,ne[1]=L>1e-4?O[1]/L:1,ne[2]=Math.max(3.5,r)/13.2,Ke(),e.uniform1f(v.uTime,ge),e.uniform3fv(v.uCamPos,ee),e.uniform1f(v.uCamR0,r),e.uniform3fv(v.uCamForward,te),e.uniform3fv(v.uCamRight,H),e.uniform3fv(v.uCamUp,O),e.uniform3fv(v.uBloomBasis,ne),e.drawArrays(e.TRIANGLES,0,6),Te()}Je(R);de();Te();
+`,Ot=`#version 300 es
+      // shaders/bloom.frag.glsl —— 屏幕空间阈值泛光：亮部提取 + 分离式高斯模糊 + 降采样拷贝
+      // uMode 三种职责合一，减少程序数：[0,0.5) 亮部阈值提取（软膝盖）；[0.5,1.5) 单方向高斯模糊；
+      // [1.5,∞) 纯拷贝（降采样到下一级，取代 (0,0) 模式的多点冗余采样，结果一致）
+      // 源纹理统一按 uTexel 换算的目标尺寸取样，故同一 pass 兼作降采样
+      precision highp float;
+      precision highp sampler2D;
+      out vec4 fragColor;
+
+      uniform sampler2D uSource;
+      uniform vec2 uTexel;       // 1/目标尺寸
+      uniform vec2 uDirection;   // 模糊方向（uv 单位），仅模糊模式使用
+      uniform float uThreshold;  // 亮部阈值，仅提取模式使用
+      uniform float uMode;
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy * uTexel;
+        if (uMode < 0.5) {
+          // 亮部提取：以最大通道作亮度，软膝盖 k² 使低于阈值的直接归零、边缘平滑
+          vec3 c = texture(uSource, uv).rgb;
+          float l = max(c.r, max(c.g, c.b));
+          float k = max(l - uThreshold, 0.0) / max(l, 1e-4);
+          fragColor = vec4(c * k * k, 1.0);
+        } else if (uMode < 1.5) {
+          // 五点二项式高斯（σ≈2.0）：权重和恒为 1
+          vec2 o = uDirection;
+          vec3 a = texture(uSource, uv).rgb * 0.227027;
+          a += (texture(uSource, uv + o)     + texture(uSource, uv - o    )).rgb * 0.1945946;
+          a += (texture(uSource, uv + o * 2.0) + texture(uSource, uv - o * 2.0)).rgb * 0.1216216;
+          a += (texture(uSource, uv + o * 3.0) + texture(uSource, uv - o * 3.0)).rgb * 0.0540540;
+          a += (texture(uSource, uv + o * 4.0) + texture(uSource, uv - o * 4.0)).rgb * 0.0162162;
+          fragColor = vec4(a, 1.0);
+        } else {
+          fragColor = vec4(texture(uSource, uv).rgb, 1.0);
+        }
+      }
+`,F=Te(e,Bt,It,"bake"),d=Te(e,Xe,Mt,"main"),L=Te(e,Xe,kt,"present"),k=Te(e,Xe,Ot,"bloom"),it=e.getExtension("EXT_color_buffer_float")||e.getExtension("EXT_color_buffer_half_float"),ee=!!it,lt=ee?e.RGBA16F:e.RGBA8,st=ee?e.HALF_FLOAT:e.UNSIGNED_BYTE,y={fbo:e.createFramebuffer(),tex:e.createTexture(),width:0,height:0},ze=3;function Ht(t,n){if(y.width===t&&y.height===n)return;e.activeTexture(e.TEXTURE0+ze),e.bindTexture(e.TEXTURE_2D,y.tex),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,e.LINEAR),e.texImage2D(e.TEXTURE_2D,0,lt,t,n,0,e.RGBA,st,null),e.activeTexture(e.TEXTURE0),e.bindFramebuffer(e.FRAMEBUFFER,y.fbo),e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_2D,y.tex,0);const a=e.checkFramebufferStatus(e.FRAMEBUFFER);if(e.bindFramebuffer(e.FRAMEBUFFER,null),a!==e.FRAMEBUFFER_COMPLETE)throw y.width=0,y.height=0,new Error("离屏渲染目标创建失败（framebuffer incomplete）");y.width=t,y.height=n}const Nt=new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),te=e.createBuffer();e.bindBuffer(e.ARRAY_BUFFER,te);e.bufferData(e.ARRAY_BUFFER,Nt,e.STATIC_DRAW);const ct=Ut(e,512),_e=512,Ue=256;function ut(t){const n=e.createFramebuffer();e.bindFramebuffer(e.FRAMEBUFFER,n);function a(i,f){const s=e.createTexture();e.bindTexture(e.TEXTURE_CUBE_MAP,s),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_CUBE_MAP,e.TEXTURE_MAG_FILTER,e.LINEAR);for(let c=0;c<6;c++)e.texImage2D(e.TEXTURE_CUBE_MAP_POSITIVE_X+c,0,i,t,t,0,e.RGBA,f,null);return e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X,s,0),e.checkFramebufferStatus(e.FRAMEBUFFER)===e.FRAMEBUFFER_COMPLETE?s:(e.deleteTexture(s),null)}let r=null;return it&&(r=a(e.RGBA16F,e.HALF_FLOAT)),r||(r=a(e.RGBA8,e.UNSIGNED_BYTE)),e.bindFramebuffer(e.FRAMEBUFFER,null),{tex:r,fbo:n}}const Be=ut(_e),Ie=ut(Ue),Me=[2,4,8],Ee=Me.map(()=>({w:0,h:0,a:null,b:null})),we=7,ye=[4,5,6];function $e(){const t=e.createTexture();return e.activeTexture(e.TEXTURE0+we),e.bindTexture(e.TEXTURE_2D,t),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,e.LINEAR),{tex:t,fbo:e.createFramebuffer()}}for(const t of Ee)t.a=$e(),t.b=$e();function Xt(t,n){const a=e.getParameter(e.ACTIVE_TEXTURE),r=e.getParameter(e.FRAMEBUFFER_BINDING),i=e.TEXTURE0+we;e.activeTexture(i);for(let f=0;f<Ee.length;f++){const s=Ee[f],h=Math.max(1,Math.floor(t/Me[f])),c=Math.max(1,Math.floor(n/Me[f]));if(!(s.w===h&&s.h===c)){for(const u of[s.a,s.b])if(e.bindTexture(e.TEXTURE_2D,u.tex),e.texImage2D(e.TEXTURE_2D,0,lt,h,c,0,e.RGBA,st,null),e.bindFramebuffer(e.FRAMEBUFFER,u.fbo),e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_2D,u.tex,0),e.checkFramebufferStatus(e.FRAMEBUFFER)!==e.FRAMEBUFFER_COMPLETE)throw s.w=0,s.h=0,e.bindFramebuffer(e.FRAMEBUFFER,r),e.activeTexture(a),new Error("泛光渲染目标创建失败（framebuffer incomplete）");s.w=h,s.h=c,e.activeTexture(e.TEXTURE0+ye[f]),e.bindTexture(e.TEXTURE_2D,s.a.tex),e.activeTexture(i)}}e.bindFramebuffer(e.FRAMEBUFFER,r),e.activeTexture(a)}const C={aPosition:e.getAttribLocation(F,"aPosition"),uFace:e.getUniformLocation(F,"uFace"),uPass:e.getUniformLocation(F,"uPass"),uGalUp:e.getUniformLocation(F,"uGalUp"),uGalRight:e.getUniformLocation(F,"uGalRight"),uGalForward:e.getUniformLocation(F,"uGalForward"),uCloudDir1:e.getUniformLocation(F,"uCloudDir1"),uCloudDir2:e.getUniformLocation(F,"uCloudDir2"),uCloudDir3:e.getUniformLocation(F,"uCloudDir3"),uCosmosSeed:e.getUniformLocation(F,"uCosmosSeed"),uNoiseTex:e.getUniformLocation(F,"uNoiseTex")},dt=e.createVertexArray(),Ge=e.createVertexArray(),mt=e.createVertexArray();e.bindVertexArray(dt);e.bindBuffer(e.ARRAY_BUFFER,te);e.enableVertexAttribArray(C.aPosition);e.vertexAttribPointer(C.aPosition,2,e.FLOAT,!1,0,0);e.bindVertexArray(mt);e.bindBuffer(e.ARRAY_BUFFER,te);const ft=e.getAttribLocation(L,"aPosition");e.enableVertexAttribArray(ft);e.vertexAttribPointer(ft,2,e.FLOAT,!1,0,0);e.useProgram(d);e.bindVertexArray(Ge);e.bindBuffer(e.ARRAY_BUFFER,te);const pt=e.getAttribLocation(d,"aPosition");e.enableVertexAttribArray(pt);e.vertexAttribPointer(pt,2,e.FLOAT,!1,0,0);const g={uResolution:e.getUniformLocation(d,"uResolution"),uInvMinDim:e.getUniformLocation(d,"uInvMinDim"),uResSharp:e.getUniformLocation(d,"uResSharp"),uStarAbundance:e.getUniformLocation(d,"uStarAbundance"),uStarAmp:e.getUniformLocation(d,"uStarAmp"),uStarFadeBlend:e.getUniformLocation(d,"uStarFadeBlend"),uTime:e.getUniformLocation(d,"uTime"),uCamPos:e.getUniformLocation(d,"uCamPos"),uCamR0:e.getUniformLocation(d,"uCamR0"),uCamForward:e.getUniformLocation(d,"uCamForward"),uCamRight:e.getUniformLocation(d,"uCamRight"),uCamUp:e.getUniformLocation(d,"uCamUp"),uGlow:e.getUniformLocation(d,"uGlow"),uDoppler:e.getUniformLocation(d,"uDoppler"),uTemp:e.getUniformLocation(d,"uTemp"),uCosmos:e.getUniformLocation(d,"uCosmos"),uBloom:e.getUniformLocation(d,"uBloom"),uSpeed:e.getUniformLocation(d,"uSpeed"),uTwinkle:e.getUniformLocation(d,"uTwinkle"),uLegacyShadow:e.getUniformLocation(d,"uLegacyShadow"),uPhotonRing:e.getUniformLocation(d,"uPhotonRing"),uHdrScene:e.getUniformLocation(d,"uHdrScene"),uBloomBasis:e.getUniformLocation(d,"uBloomBasis"),uStarShift1:e.getUniformLocation(d,"uStarShift1"),uStarShift2:e.getUniformLocation(d,"uStarShift2"),uStarShift3:e.getUniformLocation(d,"uStarShift3"),uStarShift4:e.getUniformLocation(d,"uStarShift4"),uStarShift5:e.getUniformLocation(d,"uStarShift5"),uNoiseTex:e.getUniformLocation(d,"uNoiseTex"),uNebulaCube0:e.getUniformLocation(d,"uNebulaCube0"),uNebulaCube1:e.getUniformLocation(d,"uNebulaCube1")};e.activeTexture(e.TEXTURE0);e.bindTexture(e.TEXTURE_2D,ct);e.uniform1i(g.uNoiseTex,0);e.activeTexture(e.TEXTURE1);e.bindTexture(e.TEXTURE_CUBE_MAP,Be.tex);e.uniform1i(g.uNebulaCube0,1);e.activeTexture(e.TEXTURE2);e.bindTexture(e.TEXTURE_CUBE_MAP,Ie.tex);e.uniform1i(g.uNebulaCube1,2);e.uniform1f(g.uHdrScene,ee?1:0);const J={uSource:e.getUniformLocation(k,"uSource"),uTexel:e.getUniformLocation(k,"uTexel"),uDirection:e.getUniformLocation(k,"uDirection"),uThreshold:e.getUniformLocation(k,"uThreshold"),uMode:e.getUniformLocation(k,"uMode")};e.useProgram(k);e.uniform1i(J.uSource,we);e.uniform1f(J.uThreshold,ee?.72:.55);const ht=e.createVertexArray();e.bindVertexArray(ht);e.bindBuffer(e.ARRAY_BUFFER,te);const gt=e.getAttribLocation(k,"aPosition");e.enableVertexAttribArray(gt);e.vertexAttribPointer(gt,2,e.FLOAT,!1,0,0);const I={uScene:e.getUniformLocation(L,"uScene"),uSrcSize:e.getUniformLocation(L,"uSrcSize"),uScale:e.getUniformLocation(L,"uScale"),uDownSharp:e.getUniformLocation(L,"uDownSharp"),uBloom0:e.getUniformLocation(L,"uBloom0"),uBloom1:e.getUniformLocation(L,"uBloom1"),uBloom2:e.getUniformLocation(L,"uBloom2"),uBloomStrength:e.getUniformLocation(L,"uBloomStrength"),uHdr:e.getUniformLocation(L,"uHdr")};e.useProgram(L);e.activeTexture(e.TEXTURE0+ze);e.bindTexture(e.TEXTURE_2D,y.tex);e.uniform1i(I.uScene,ze);e.uniform1i(I.uBloom0,ye[0]);e.uniform1i(I.uBloom1,ye[1]);e.uniform1i(I.uBloom2,ye[2]);e.uniform1f(I.uHdr,ee?1:0);e.useProgram(d);e.activeTexture(e.TEXTURE0);const B=new Float32Array(3),vt=new Float32Array(3),St=new Float32Array(3),Et=new Float32Array(3),Rt=new Float32Array(3),bt=new Float32Array(3),fe=new Float32Array(4),re=new Float32Array(3);function zt(t,n,a,r){const i=Math.hypot(n,a,r)||1;t[0]=n/i,t[1]=a/i,t[2]=r/i}function Gt(t,n,a){t[0]=n[1]*a[2]-n[2]*a[1],t[1]=n[2]*a[0]-n[0]*a[2],t[2]=n[0]*a[1]-n[1]*a[0]}function ie(t){const n=Math.random()*2-1,a=Math.random()*Math.PI*2,r=Math.sqrt(Math.max(0,1-n*n));t[0]=r*Math.cos(a),t[1]=n,t[2]=r*Math.sin(a)}function Vt(){e.useProgram(F),e.bindVertexArray(dt),e.activeTexture(e.TEXTURE0),e.bindTexture(e.TEXTURE_2D,ct),e.uniform1i(C.uNoiseTex,0),e.uniform3fv(C.uGalUp,B),e.uniform3fv(C.uGalRight,vt),e.uniform3fv(C.uGalForward,St),e.uniform3fv(C.uCloudDir1,Et),e.uniform3fv(C.uCloudDir2,Rt),e.uniform3fv(C.uCloudDir3,bt),e.uniform4fv(C.uCosmosSeed,fe),e.bindFramebuffer(e.FRAMEBUFFER,Be.fbo),e.viewport(0,0,_e,_e),e.uniform1i(C.uPass,0);for(let t=0;t<6;t++)e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X+t,Be.tex,0),e.uniform1i(C.uFace,t),e.drawArrays(e.TRIANGLES,0,6);e.bindFramebuffer(e.FRAMEBUFFER,Ie.fbo),e.viewport(0,0,Ue,Ue),e.uniform1i(C.uPass,1);for(let t=0;t<6;t++)e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_CUBE_MAP_POSITIVE_X+t,Ie.tex,0),e.uniform1i(C.uFace,t),e.drawArrays(e.TRIANGLES,0,6);e.bindFramebuffer(e.FRAMEBUFFER,null),w.width>0&&w.height>0&&e.viewport(0,0,w.width,w.height),e.bindVertexArray(Ge),e.useProgram(d)}function xt(){ie(B);const t=Math.abs(B[1])<.85?0:1,n=Math.abs(B[1])<.85?1:0,a=[n*B[2],-t*B[2],t*B[1]-n*B[0]];zt(a,a[0],a[1],a[2]);const r=[0,0,0];Gt(r,B,a);const i=Math.random()*Math.PI*2,f=Math.cos(i),s=Math.sin(i);for(let p=0;p<3;p++)vt[p]=f*a[p]+s*r[p],St[p]=-s*a[p]+f*r[p];ie(Et),ie(Rt),ie(bt);for(let p=0;p<4;p++)fe[p]=Math.random()*100;for(let p=0;p<3;p++)re[p]=(Math.random()-.5)*400;Vt();const h=re[0],c=re[1],u=re[2];e.uniform3f(g.uStarShift1,h*1.73,c*1.73,u*1.73),e.uniform3f(g.uStarShift2,h*1.31,c*1.31,u*1.31),e.uniform3f(g.uStarShift3,h,c,u),e.uniform3f(g.uStarShift4,h*.67,c*.67,u*.67),e.uniform3f(g.uStarShift5,h*.37,c*.37,u*.37);const v=Math.floor((fe[0]*4096+fe[1]*256)%65535).toString(16).toUpperCase().padStart(4,"0"),m=document.getElementById("tel-seed");m&&(m.textContent=`#${v}`)}const l={yaw:.42,pitch:.142,rollDeg:-10,zoomScale:1,glow:1.22,doppler:1,temp:1,cosmos:1,bloom:.8,screenBloom:.7,speed:1,twinkle:1,renderScale:1.2,autoDRS:!0,autoRotate:!0,legacyShadow:!1,photonRing:!1},ke=13.2,W=Math.PI*2,je=.0055,qt=.0012,Yt=.065,Wt=l.renderScale,Kt=.7,Zt=.7,$t=.7,jt=1,Jt=e.getParameter(e.MAX_TEXTURE_SIZE),Qt=[[.5,.1],[.55,.11],[.6,.14],[.65,.16],[.7,.19],[.75,.23],[.8,.26],[.85,.31],[.9,.36],[.95,.44],[1,.52],[1.02,.56],[1.05,.6],[1.1,.73],[1.15,.85],[1.2,1]];function en(t){const n=Qt;if(t<=n[0][0])return n[0][1];for(let a=1;a<n.length;a++)if(t<n[a][0]){const r=(t-n[a-1][0])/(n[a][0]-n[a-1][0]);return n[a-1][1]+(n[a][1]-n[a-1][1])*r}return 1}function Je(t,n){let a=(n-t)%W;return a>Math.PI&&(a-=W),a<-Math.PI&&(a+=W),a}function Re(t){let n=t%W;return n>Math.PI&&(n-=W),n<-Math.PI&&(n+=W),n}const o={yaw:l.yaw,pitch:l.pitch,rollDeg:l.rollDeg,zoomScale:l.zoomScale,targetYaw:l.yaw,targetPitch:l.pitch,targetRollDeg:l.rollDeg,targetZoomScale:l.zoomScale,autoRotate:l.autoRotate,autoDRS:l.autoDRS,renderScale:l.renderScale,glow:l.glow,doppler:l.doppler,temp:l.temp,cosmos:l.cosmos,bloom:l.bloom,screenBloom:l.screenBloom,speed:l.speed,twinkle:l.twinkle,legacyShadow:l.legacyShadow,photonRing:l.photonRing,uniformsDirty:!0};function Tt(){o.uniformsDirty&&(e.useProgram(d),e.uniform1f(g.uGlow,o.glow),e.uniform1f(g.uDoppler,o.doppler),e.uniform1f(g.uTemp,o.temp),e.uniform1f(g.uCosmos,o.cosmos),e.uniform1f(g.uBloom,o.bloom),e.uniform1f(g.uSpeed,o.speed),e.uniform1f(g.uTwinkle,o.twinkle),e.uniform1f(g.uLegacyShadow,o.legacyShadow?1:0),e.uniform1f(g.uPhotonRing,o.photonRing?1:0),e.uniform1f(g.uStarFadeBlend,$t),e.useProgram(L),e.uniform1f(I.uBloomStrength,o.screenBloom),e.useProgram(d),o.uniformsDirty=!1)}const le=new Float32Array(3),se=new Float32Array(3),V=new Float32Array(3),q=new Float32Array(3),ce=new Float32Array(3);let De=null;function tn(){return De||(De=document.getElementById("tel-res")),De}function G(){const t=Math.max(1,w.clientWidth||window.innerWidth),n=Math.max(1,w.clientHeight||window.innerHeight),a=window.devicePixelRatio||1,r=Math.min(a,1.5),i=280/Math.min(t,n),f=Math.max(i,r*o.renderScale),s=Math.round(t*a),h=Math.round(n*a);let c=Math.round(t*f),u=Math.round(n*f);const v=Math.max(c,u)/Jt;v>1&&(c=Math.max(1,Math.floor(c/v)),u=Math.max(1,Math.floor(u/v)));const m=w.width!==s||w.height!==h,p=y.width!==c||y.height!==u;if(!m&&!p)return;m&&(w.width=s,w.height=h),Ht(c,u),Xt(c,u);const S=Math.min(c,u),T=S/850,E=Math.min(30,Math.max(.15,T*T));e.useProgram(d),e.uniform2f(g.uResolution,c,u),e.uniform1f(g.uInvMinDim,1/S),e.uniform1f(g.uResSharp,E);const b=Math.min(1,Math.max(.35,f/(a*Wt)));e.uniform1f(g.uStarAbundance,1-Kt*(1-b));const A=en(f/r);e.uniform1f(g.uStarAmp,1-Zt*(1-A)),e.useProgram(L),e.uniform2f(I.uSrcSize,c,u),e.uniform2f(I.uScale,c/s,u/h),e.uniform1f(I.uDownSharp,jt),e.useProgram(d);const x=tn();x&&(x.textContent=`${c}×${u} (${o.renderScale.toFixed(2)}x)`)}const nn=document.getElementById("slider-zoom"),on=document.getElementById("val-zoom");function X(t){o.targetZoomScale=Math.max(.1,Math.min(2.5,t)),nn.value=o.targetZoomScale.toFixed(2),on.textContent=o.targetZoomScale.toFixed(2)+"x"}function wt(t,n,a){o.yaw=Re(o.yaw),o.pitch=Re(o.pitch),o.targetYaw=o.yaw+Je(o.yaw,t),o.targetPitch=o.pitch+Je(o.pitch,n),o.targetRollDeg=a}let _=!1,H=0,N=0;function Qe(t,n){const a=o.rollDeg*Math.PI/180,r=Math.cos(a),i=Math.sin(a),f=r*t+i*n,s=-i*t+r*n,h=Math.cos(o.targetPitch)>=0?1:-1;o.targetYaw-=f*je*h,o.targetPitch+=s*je,z()}const Ve=document.querySelectorAll(".preset-btn");function z(){Ve.forEach(t=>t.classList.remove("active"))}let et=!1;function an(){if(et)return;et=!0,w.addEventListener("mousedown",n=>{_=!0,H=n.clientX,N=n.clientY}),window.addEventListener("mousemove",n=>{if(!_)return;const a=n.clientX-H,r=n.clientY-N;H=n.clientX,N=n.clientY,Qe(a,r)}),window.addEventListener("mouseup",()=>{_=!1}),w.addEventListener("wheel",n=>{n.preventDefault();const a=Math.exp(-n.deltaY*qt);X(o.targetZoomScale*a),z()},{passive:!1});let t=0;w.addEventListener("touchstart",n=>{n.preventDefault(),n.touches.length===1?(_=!0,H=n.touches[0].clientX,N=n.touches[0].clientY):n.touches.length>=2&&(_=!1,t=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY))},{passive:!1}),w.addEventListener("touchmove",n=>{if(n.preventDefault(),_&&n.touches.length===1){const a=n.touches[0].clientX-H,r=n.touches[0].clientY-N;H=n.touches[0].clientX,N=n.touches[0].clientY,Qe(a,r)}else if(n.touches.length>=2){const a=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY);t>0&&(X(o.targetZoomScale*(a/t)),z()),t=a}},{passive:!1}),w.addEventListener("touchend",n=>{n.touches.length===0?(_=!1,t=0):n.touches.length===1&&(t=0,_=!0,H=n.touches[0].clientX,N=n.touches[0].clientY)},{passive:!1}),window.addEventListener("gesturestart",n=>n.preventDefault(),{passive:!1}),window.addEventListener("gesturechange",n=>n.preventDefault(),{passive:!1}),window.addEventListener("gestureend",n=>n.preventDefault(),{passive:!1}),Ve.forEach(n=>{n.addEventListener("click",()=>{z(),n.classList.add("active");const a=Re(o.yaw);wt(a,parseFloat(n.dataset.pitch),parseFloat(n.dataset.roll)),X(parseFloat(n.dataset.scale)),document.getElementById("slider-roll").value=o.targetRollDeg,document.getElementById("val-roll").textContent=`${Math.round(o.targetRollDeg)}°`})})}const D={zh:{langBtn:"EN",headerTitle:"Gargantua // 卡冈都亚",controlsTitle:"时空光学控制",telFps:"实时帧率",telDist:"视界距离",telRsh:"光子环Rc",telInc:"轨道姿态",telRes:"渲染缓冲",telSeed:"星域序列",preset1:"经典卡冈都亚",preset2:"掠射赤道 88°",preset3:"极轴俯瞰 90°",lblZoom:"视界尺度",lblGlow:"吸积盘光度",lblDoppler:"多普勒集束",lblTemp:"黑体色温",lblCosmos:"星尘丰度",lblTwinkle:"星光闪烁",lblBloom:"镜头眩光",lblScreenBloom:"泛光",lblSpeed:"轨道角速",lblRoll:"镜头倾角",lblScale:"超采样率",drsOn:"自适应满帧: 开",drsOff:"自适应满帧: 关",cruiseOn:"轨道巡航: 开",cruiseOff:"轨道巡航: 关",legacyShadow:"旧版黑洞",photonRing:"光子环",randomCosmos:"随机星域",resetAll:"全部重置",hideHud:"隐藏界面 (H)",showHud:"显示界面 (H)",hideHudShort:"隐藏",showHudShort:"显示",btnLandscape:"横屏",btnPortrait:"竖屏"},en:{langBtn:"FR",headerTitle:"Gargantua // Deep Space Optics",controlsTitle:"Spacetime Optics",telFps:"Frame Rate",telDist:"Horizon Distance",telRsh:"Photon Ring Rc",telInc:"Orbit Attitude",telRes:"Render Buffer",telSeed:"Cosmos Seed",preset1:"Classic",preset2:"Equator 88°",preset3:"Polar 90°",lblZoom:"Horizon Scale",lblGlow:"Disk Luminosity",lblDoppler:"Doppler Beaming",lblTemp:"Planck Temp",lblCosmos:"Stardust Density",lblTwinkle:"Star Twinkle",lblBloom:"Lens Bloom",lblScreenBloom:"Bloom",lblSpeed:"Orbital Spin",lblRoll:"Camera Roll",lblScale:"Render Scale",drsOn:"DRS: ON",drsOff:"DRS: OFF",cruiseOn:"Cruise: ON",cruiseOff:"Cruise: OFF",legacyShadow:"Legacy Shadow",photonRing:"Photon Ring",randomCosmos:"Random Cosmos",resetAll:"Reset All",hideHud:"Hide HUD (H)",showHud:"Show HUD (H)",hideHudShort:"Hide",showHudShort:"Show",btnLandscape:"Rotate",btnPortrait:"Portrait"},fr:{langBtn:"LA",headerTitle:"Gargantua // Optique Spatiale",controlsTitle:"Optique Spatiale",telFps:"Images / s",telDist:"Distance Horizon",telRsh:"Anneau Photon Rc",telInc:"Attitude Orbitale",telRes:"Tampon de Rendu",telSeed:"Graine Cosmique",preset1:"Classique",preset2:"Équateur 88°",preset3:"Polaire 90°",lblZoom:"Échelle d’Horizon",lblGlow:"Luminosité Disque",lblDoppler:"Faisceau Doppler",lblTemp:"Temp. de Planck",lblCosmos:"Densité Poussière",lblTwinkle:"Scintillement",lblBloom:"Éclat Optique",lblScreenBloom:"Halo",lblSpeed:"Vitesse Orbitale",lblRoll:"Roulis Caméra",lblScale:"Suréchantillonnage",drsOn:"DRS: ACTIF",drsOff:"DRS: INACTIF",cruiseOn:"Croisière: ON",cruiseOff:"Croisière: OFF",legacyShadow:"Ombre Rétro",photonRing:"Anneau Photon",randomCosmos:"Cosmos Aléat.",resetAll:"Rétablir",hideHud:"Masquer HUD (H)",showHud:"Afficher HUD (H)",hideHudShort:"Masquer",showHudShort:"Afficher",btnLandscape:"Paysage",btnPortrait:"Portrait"},la:{langBtn:"中文",headerTitle:"Gargantua // Optica Relativistica",controlsTitle:"Optica Spatiotemporis",telFps:"Frequentia FPS",telDist:"Distantia Horizontis",telRsh:"Anulus Photonum Rc",telInc:"Habitus Orbitae",telRes:"Memoria Reditionis",telSeed:"Semen Cosmici",preset1:"Classicus",preset2:"Aequator 88°",preset3:"Polaris 90°",lblZoom:"Magnitudo Horizontis",lblGlow:"Luminositas Disci",lblDoppler:"Fasciculus Doppler",lblTemp:"Temp. Planckiana",lblCosmos:"Densitas Stellaris",lblTwinkle:"Scintillatio",lblBloom:"Effulgentia Lentis",lblScreenBloom:"Fulgor",lblSpeed:"Velocitas Orbitae",lblRoll:"Inclinatio Camerae",lblScale:"Gradus Reditionis",drsOn:"DRS: ACTUM",drsOff:"DRS: CLAUSUM",cruiseOn:"Cursus: ON",cruiseOff:"Cursus: OFF",legacyShadow:"Umbra Vetus",photonRing:"Anulus Photonum",randomCosmos:"Cosmos Novus",resetAll:"Restituere",hideHud:"Occultare HUD (H)",showHud:"Monstrare HUD (H)",hideHudShort:"Occultare",showHudShort:"Monstrare",btnLandscape:"In Latus",btnPortrait:"Rectum"}},pe=["zh","en","fr","la"];let R="zh";try{const t=localStorage.getItem("gargantua_lang");pe.includes(t)&&(R=t)}catch{}const yt=[];function rn(t){yt.push(t)}function ln(){for(const t of yt)t()}function Dt(t){if(!D[t])return;R=t;const n={zh:"zh-CN",en:"en",fr:"fr",la:"la"};document.documentElement.lang=n[t]||t,document.querySelectorAll("[data-i18n]").forEach(a=>{const r=a.getAttribute("data-i18n");D[R]&&D[R][r]&&(a.textContent=D[R][r])}),ln();try{localStorage.setItem("gargantua_lang",R)}catch{}}function tt(){const t=pe.indexOf(R),n=pe[(t+1)%pe.length];Dt(n)}const Ae=document.getElementById("tel-fps"),sn=document.getElementById("tel-dist"),cn=document.getElementById("tel-rsh"),un=document.getElementById("tel-inc");function be(){const t=ke/o.zoomScale;sn.textContent=`${o.zoomScale.toFixed(2)}x (${t.toFixed(1)} Rs)`,cn.textContent=`${(2.598*o.zoomScale).toFixed(2)} Rs`;const n=((o.pitch*180/Math.PI+180)%360+360)%360-180,a=(o.yaw*180/Math.PI%360+360)%360,r=n>=0?"+":"";un.textContent=`${r}${n.toFixed(1)}° / ${Math.round(a)}°`}const he=document.getElementById("btn-toggle-hud"),Q=document.getElementById("btn-landscape"),Z=document.getElementById("btn-drs"),ge=document.getElementById("btn-autorotate"),ue=document.getElementById("btn-lang");function de(){Z.textContent=o.autoDRS?D[R].drsOn:D[R].drsOff}function Ce(){ge.textContent=o.autoRotate?D[R].cruiseOn:D[R].cruiseOff}function qe(){const t=document.body.classList.contains("hud-hidden"),n=t?D[R].showHud:D[R].hideHud,a=t?D[R].showHudShort:D[R].hideHudShort,r=he.querySelector(".hud-text-full"),i=he.querySelector(".hud-text-short");r&&i?(r.textContent=n,i.textContent=a):he.textContent=n}function $(){if(!Q)return;const t=window.innerWidth>window.innerHeight,n=!!(document.fullscreenElement||document.webkitFullscreenElement),a=t||n;Q.textContent=a?D[R].btnPortrait:D[R].btnLandscape,Q.title=a?R==="zh"?"切换至竖屏":"Switch to Portrait":R==="zh"?"切换至横屏":"Switch to Landscape"}async function dn(){const t=window.innerWidth>window.innerHeight,n=!!(document.fullscreenElement||document.webkitFullscreenElement);if(!t||!n){try{const a=document.documentElement,r=a.requestFullscreen||a.webkitRequestFullscreen||a.mozRequestFullScreen||a.msRequestFullscreen;r&&!n&&await r.call(a),document.body.classList.add("fullscreen-landscape")}catch{}try{screen.orientation&&screen.orientation.lock&&await screen.orientation.lock("landscape")}catch{}}else{document.body.classList.remove("fullscreen-landscape");try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch{}try{const a=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen;a&&n&&await a.call(document)}catch{}}setTimeout($,150)}function nt(){document.body.classList.toggle("hud-hidden"),qe()}function mn(t){document.body.classList.toggle("hud-hidden",!0),qe()}let ot=!1;function fn(){if(ot)return;ot=!0,he.addEventListener("click",nt),Q&&Q.addEventListener("click",dn);function t(){!document.fullscreenElement&&!document.webkitFullscreenElement&&document.body.classList.remove("fullscreen-landscape"),$()}document.addEventListener("fullscreenchange",t),document.addEventListener("webkitfullscreenchange",t),window.screen&&window.screen.orientation&&window.screen.orientation.addEventListener("change",$),window.addEventListener("resize",$),ue&&ue.addEventListener("click",tt),window.addEventListener("keydown",m=>{m.target&&(m.target.tagName==="INPUT"||m.target.tagName==="TEXTAREA")||((m.key==="h"||m.key==="H")&&nt(),(m.key==="l"||m.key==="L")&&tt())}),document.getElementById("slider-scale"),document.getElementById("val-scale");const n=document.getElementById("slider-zoom");n.addEventListener("input",()=>{X(parseFloat(n.value)),z()});const a=document.getElementById("slider-roll"),r=document.getElementById("val-roll");a.addEventListener("input",()=>{o.targetRollDeg=parseFloat(a.value),r.textContent=`${Math.round(o.targetRollDeg)}°`,z()});function i(m,p,S,T=""){const E=document.getElementById(m),b=document.getElementById(p);E.addEventListener("input",()=>{o[S]=parseFloat(E.value),b.textContent=o[S].toFixed(2)+T,S==="renderScale"?(o.autoDRS=!1,Z.classList.remove("active"),de(),G()):o.uniformsDirty=!0,be()})}i("slider-glow","val-glow","glow"),i("slider-doppler","val-doppler","doppler"),i("slider-temp","val-temp","temp"),i("slider-cosmos","val-cosmos","cosmos"),i("slider-bloom","val-bloom","bloom"),i("slider-screenbloom","val-screenbloom","screenBloom"),i("slider-speed","val-speed","speed"),i("slider-twinkle","val-twinkle","twinkle"),i("slider-scale","val-scale","renderScale","x"),X(o.zoomScale),a.value=o.targetRollDeg,r.textContent=`${Math.round(o.targetRollDeg)}°`;for(const[m,p,S,T]of[["slider-glow","val-glow","glow",""],["slider-doppler","val-doppler","doppler",""],["slider-temp","val-temp","temp",""],["slider-cosmos","val-cosmos","cosmos",""],["slider-bloom","val-bloom","bloom",""],["slider-screenbloom","val-screenbloom","screenBloom",""],["slider-speed","val-speed","speed",""],["slider-twinkle","val-twinkle","twinkle",""],["slider-scale","val-scale","renderScale","x"]])document.getElementById(m).value=o[S],document.getElementById(p).textContent=o[S].toFixed(2)+T;Z.addEventListener("click",()=>{o.autoDRS=!o.autoDRS,Z.classList.toggle("active",o.autoDRS),de()}),ge.addEventListener("click",()=>{o.autoRotate=!o.autoRotate,ge.classList.toggle("active",o.autoRotate),Ce()});const f=document.getElementById("btn-legacy-shadow"),s=document.getElementById("btn-photonring-toggle");function h(m){o.legacyShadow=m,m&&o.photonRing&&(o.photonRing=!1,s.classList.remove("active")),o.uniformsDirty=!0,f.classList.toggle("active",o.legacyShadow)}function c(m){o.photonRing=m,m&&o.legacyShadow&&(o.legacyShadow=!1,f.classList.remove("active")),o.uniformsDirty=!0,s.classList.toggle("active",o.photonRing)}f.addEventListener("click",()=>{h(!o.legacyShadow)}),s.addEventListener("click",()=>{c(!o.photonRing)}),document.getElementById("btn-random-cosmos").addEventListener("click",()=>{xt()}),document.getElementById("btn-reset").addEventListener("click",()=>{wt(l.yaw,l.pitch,l.rollDeg),X(l.zoomScale),o.glow=l.glow,o.doppler=l.doppler,o.temp=l.temp,o.cosmos=l.cosmos,o.bloom=l.bloom,o.screenBloom=l.screenBloom,o.speed=l.speed,o.twinkle=l.twinkle,o.renderScale=l.renderScale,o.autoDRS=l.autoDRS,o.autoRotate=l.autoRotate,o.legacyShadow=l.legacyShadow,o.photonRing=l.photonRing,o.uniformsDirty=!0,f.classList.remove("active"),s.classList.remove("active"),a.value=l.rollDeg,r.textContent=`${Math.round(l.rollDeg)}°`,Z.classList.add("active"),ge.classList.add("active"),de(),Ce(),z(),Ve[0].classList.add("active");const m=[["slider-glow","val-glow",l.glow,""],["slider-doppler","val-doppler",l.doppler,""],["slider-temp","val-temp",l.temp,""],["slider-cosmos","val-cosmos",l.cosmos,""],["slider-bloom","val-bloom",l.bloom,""],["slider-screenbloom","val-screenbloom",l.screenBloom,""],["slider-speed","val-speed",l.speed,""],["slider-twinkle","val-twinkle",l.twinkle,""],["slider-scale","val-scale",l.renderScale,"x"]];for(const[p,S,T,E]of m)document.getElementById(p).value=T,document.getElementById(S).textContent=T.toFixed(2)+E;G(),be()}),rn(()=>{de(),Ce(),qe(),$(),ue&&(ue.textContent=D[R].langBtn),v()});const u=document.querySelector(".controls");function v(){if(!u)return;const m=u.scrollHeight-u.clientHeight>4,p=u.scrollTop<4,S=u.scrollHeight-u.scrollTop-u.clientHeight<4;u.classList.toggle("show-fade",m&&!S),u.classList.toggle("show-fade-top",m&&!p)}u&&(u.addEventListener("scroll",v,{passive:!0}),window.addEventListener("resize",v),u.addEventListener("pointerdown",()=>u.classList.add("pressing")),window.addEventListener("pointerup",()=>u.classList.remove("pressing")),window.addEventListener("pointercancel",()=>u.classList.remove("pressing")),requestAnimationFrame(v),setTimeout(v,300))}let at=!1,Oe=0,At=0,Ct=!1;function pn(){return Ct}function hn(t){return Oe<=0?!1:t-At<1e3/Oe-1}function gn(t){At=t}function ve(t,n,a){return Math.min(a,Math.max(n,t))}function Lt(){const t=document.getElementById("slider-scale"),n=document.getElementById("val-scale");t&&(t.value=o.renderScale.toFixed(2)),n&&(n.textContent=o.renderScale.toFixed(2)+"x")}function rt(){at||(at=!0,mn(),o.renderScale>.8&&(o.renderScale=.8,Lt(),G()),o.uniformsDirty=!0)}const Pt={glow:["glow",.4,2.4,"val-glow",null],doppler:["doppler",0,1.6,"val-doppler",null],temp:["temp",.6,1.6,"val-temp",null],cosmos:["cosmos",0,2,"val-cosmos",null],bloom:["bloom",0,2,"val-bloom",null],screenbloom:["screenBloom",0,2,"val-screenbloom",null],speed:["speed",0,2.2,"val-speed",null],twinkle:["twinkle",0,3,"val-twinkle",null]};function vn(t,n){const a=Pt[t];if(!a)return;const r=parseFloat(n);if(!isFinite(r))return;const[i,f,s,h]=a;o[i]=ve(r,f,s),o.uniformsDirty=!0;const c=document.getElementById(h);c&&(c.textContent=o[i].toFixed(2))}window.wallpaperPropertyListener={applyUserProperties(t){if(t){rt();for(const n of Object.keys(Pt))t[n]&&vn(n,t[n].value);if(t.renderscale){const n=parseFloat(t.renderscale.value);isFinite(n)&&(o.renderScale=ve(n,.5,1.8),Lt(),G())}if(t.zoom){const n=parseFloat(t.zoom.value);isFinite(n)&&X(ve(n,.1,2.5))}if(t.roll){const n=parseFloat(t.roll.value);if(isFinite(n)){o.targetRollDeg=ve(n,-180,180);const a=document.getElementById("slider-roll"),r=document.getElementById("val-roll");a&&(a.value=Math.round(o.targetRollDeg)),r&&(r.textContent=`${Math.round(o.targetRollDeg)}°`)}}t.cruise&&(o.autoRotate=t.cruise.value===!0),t.drs&&(o.autoDRS=t.drs.value===!0),t.photonring&&(o.photonRing=t.photonring.value===!0,o.uniformsDirty=!0)}},applyGeneralProperties(t){if(t&&(rt(),t.fps)){const n=parseFloat(t.fps.value);Oe=isFinite(n)&&n>0?n:0}},setPaused(t){Ct=!!t}};const Sn=document.getElementById("slider-scale"),En=document.getElementById("val-scale"),Le=document.getElementById("fps-mini");an();fn();xt();window.addEventListener("resize",G);G();Tt();let Pe=0,He=performance.now(),j=0,Y=0,Se=0,Ne=!0,Fe=null;function xe(){Fe!==null&&cancelAnimationFrame(Fe),Fe=requestAnimationFrame(xn)}document.addEventListener("visibilitychange",()=>{Ne=!document.hidden,Ne&&(He=performance.now(),j=0,Y=0,Se=0,xe())});const Rn=[1.5,1.8,2];function me(t,n,a,r,i,f,s){e.activeTexture(e.TEXTURE0+we),e.bindTexture(e.TEXTURE_2D,t),e.uniform2f(J.uTexel,1/a,1/r),e.uniform2f(J.uDirection,f,s),e.uniform1f(J.uMode,i),e.bindFramebuffer(e.FRAMEBUFFER,n),e.viewport(0,0,a,r),e.drawArrays(e.TRIANGLES,0,6)}function bn(){e.useProgram(k),e.bindVertexArray(ht);const t=Ee;me(y.tex,t[0].a.fbo,t[0].w,t[0].h,0,0,0);for(let n=0;n<t.length;n++){const a=t[n],r=Rn[n];if(me(a.a.tex,a.b.fbo,a.w,a.h,1,r/a.w,0),me(a.b.tex,a.a.fbo,a.w,a.h,1,0,r/a.h),n+1<t.length){const i=t[n+1];me(a.a.tex,i.a.fbo,i.w,i.h,2,0,0)}}}function xn(t){if(!Ne)return;if(pn()||hn(t)){xe();return}const n=Math.min(.1,(t-He)*.001);if(He=t,Pe=(Pe+n)%36e3,j++,Y+=n,Se+=n,Y>=.5){const x=Math.round(j/Y),M=(Y/j*1e3).toFixed(1);if(Ae.textContent=`${x} FPS (${M} ms)`,Ae.style.color=x>=52?"#68d8a6":x>=32?"#e5c89b":"#ff6b6b",Le&&(Le.textContent=`${x}`,Le.style.color=Ae.style.color),o.autoDRS){let P=o.renderScale;x<54&&o.renderScale>.6?P=Math.max(.6,o.renderScale-.06):x>=58&&o.renderScale<1.3&&(P=Math.min(1.3,o.renderScale+.05)),Math.abs(P-o.renderScale)>.01&&(o.renderScale=P,Sn.value=P.toFixed(2),En.textContent=P.toFixed(2)+"x",G())}j=0,Y=0}if(o.autoRotate&&!_){const x=Math.cos(o.targetPitch)>=0?1:-1;o.targetYaw+=Yt*n*x}const a=1-Math.exp(-9.5*n);o.yaw+=(o.targetYaw-o.yaw)*a,o.pitch+=(o.targetPitch-o.pitch)*a,o.rollDeg+=(o.targetRollDeg-o.rollDeg)*a,o.zoomScale+=(o.targetZoomScale-o.zoomScale)*a,!_&&Math.abs(o.targetYaw-o.yaw)<1e-4&&(o.yaw=Re(o.yaw),o.targetYaw=o.yaw),Se>=.25&&(be(),Se=0);const r=ke/o.zoomScale,i=Math.cos(o.pitch),f=Math.sin(o.pitch),s=Math.cos(o.yaw),h=Math.sin(o.yaw);le[0]=r*i*h,le[1]=r*f,le[2]=r*i*s,se[0]=-i*h,se[1]=-f,se[2]=-i*s;const c=s,u=0,v=-h,m=-f*h,p=i,S=-f*s,T=o.rollDeg*Math.PI/180,E=Math.cos(T),b=Math.sin(T);V[0]=E*c-b*m,V[1]=E*u-b*p,V[2]=E*v-b*S,q[0]=b*c+E*m,q[1]=b*u+E*p,q[2]=b*v+E*S;const A=Math.hypot(V[1],q[1]);ce[0]=A>1e-4?V[1]/A:0,ce[1]=A>1e-4?q[1]/A:1,ce[2]=Math.max(3.5,r)/ke,e.useProgram(d),e.bindVertexArray(Ge),e.bindFramebuffer(e.FRAMEBUFFER,y.fbo),e.viewport(0,0,y.width,y.height),Tt(),e.uniform1f(g.uTime,Pe),e.uniform3fv(g.uCamPos,le),e.uniform1f(g.uCamR0,r),e.uniform3fv(g.uCamForward,se),e.uniform3fv(g.uCamRight,V),e.uniform3fv(g.uCamUp,q),e.uniform3fv(g.uBloomBasis,ce),e.drawArrays(e.TRIANGLES,0,6),o.screenBloom>1e-4&&bn(),e.useProgram(L),e.bindVertexArray(mt),e.bindFramebuffer(e.FRAMEBUFFER,null),e.viewport(0,0,w.width,w.height),e.drawArrays(e.TRIANGLES,0,6),gn(t),xe()}Dt(R);be();xe();
 </script>
   <style>
 :root{--panel-bg: rgba(6, 8, 13, .75);--border-hairline: rgba(226, 212, 190, .15);--border-active: rgba(226, 200, 155, .45);--gold-champagne: #e5c89b;--platinum: #f2f5f9;--slate-dim: #7e8a9c;--ok-green: #68d8a6}*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-font-smoothing:antialiased}body,html{width:100%;height:100%;overflow:hidden;background-color:#000;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Microsoft YaHei,sans-serif;color:var(--platinum);touch-action:none;overscroll-behavior:none}canvas{display:block;width:100vw;height:100vh;cursor:grab;touch-action:none}canvas:active{cursor:grabbing}.hud-transition{transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1,.3,1)}body.hud-hidden .hud-panel{opacity:0;pointer-events:none;transform:translateY(8px)}.hud-header{position:fixed;top:26px;left:30px;pointer-events:none;z-index:10;mix-blend-mode:difference}.hud-header .eyebrow{font-size:.64rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold-champagne);opacity:.85;margin-bottom:4px;font-weight:500}.hud-header h1{font-size:1.22rem;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--platinum);margin-bottom:4px}.telemetry{position:fixed;bottom:26px;left:30px;width:236px;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;border-radius:0;padding:0;font-size:.7rem;line-height:1.65;pointer-events:none;z-index:10;font-variant-numeric:tabular-nums;box-shadow:none;mix-blend-mode:difference}.telemetry .perf-row{padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid rgba(226,212,190,.15);display:flex;justify-content:space-between;align-items:center;gap:10px;white-space:nowrap}.telemetry .label{color:var(--slate-dim);letter-spacing:.4px;flex:1;overflow:hidden;text-overflow:ellipsis}.telemetry .fps-badge{color:var(--ok-green);font-weight:500;font-family:SFMono-Regular,Consolas,monospace;flex-shrink:0;text-align:right}.telemetry .row{display:flex;justify-content:space-between;align-items:center;gap:10px;white-space:nowrap}.telemetry .val{color:var(--gold-champagne);font-family:SFMono-Regular,Consolas,monospace;flex-shrink:0;text-align:right}.fps-mini{display:none}.controls{position:fixed;top:24px;right:28px;width:260px;max-height:calc(100vh - 48px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:none;border-radius:0;padding:0;z-index:10;box-shadow:none;font-variant-numeric:tabular-nums;mix-blend-mode:difference}.controls::-webkit-scrollbar{width:12px}.controls::-webkit-scrollbar-track{background:transparent}.controls::-webkit-scrollbar-thumb{background:rgb(229 200 155 / var(--thumb-a));background-clip:padding-box;border:3px solid transparent;border-radius:6px;box-shadow:inset 0 0 0 1px #ffffff14,0 0 6px #00000040}.controls::-webkit-scrollbar-thumb:hover,.controls::-webkit-scrollbar-thumb:active{background-color:rgb(229 200 155 / var(--thumb-a))}.controls::-webkit-scrollbar-button{display:none;width:0;height:0}@supports not selector(::-webkit-scrollbar){.controls{scrollbar-width:thin;scrollbar-color:rgba(229,200,155,.22) transparent}}@property --fade-top{syntax: "<length>"; inherits: false; initial-value: 0px;}@property --fade-bottom{syntax: "<length>"; inherits: false; initial-value: 0px;}@property --thumb-a{syntax: "<number>"; inherits: true; initial-value: .22;}.controls{--fade-top: 0px;--fade-bottom: 0px;--thumb-a: .22;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade-top),#000 calc(100% - var(--fade-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade-top),#000 calc(100% - var(--fade-bottom)),transparent 100%);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1,.3,1),--fade-top .35s ease,--fade-bottom .35s ease,--thumb-a .18s ease-out}.controls.pressing{--thumb-a: .45}.controls.show-fade{--fade-bottom: 30px}.controls.show-fade-top{--fade-top: 30px}.controls h2{font-size:.82rem;font-weight:500;letter-spacing:1.5px;margin-bottom:9px;padding-bottom:5px;border-bottom:1.5px solid var(--gold-champagne);color:var(--gold-champagne);display:flex;justify-content:space-between;align-items:center;min-height:26px}.controls h2 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lang-switch-btn{width:34px;height:18px;padding:0;font-size:.6rem;letter-spacing:.5px;color:var(--slate-dim);background:#ffffff0a;border:1px solid rgba(255,255,255,.14);border-radius:3px;cursor:pointer;transition:all .2s ease;font-family:SFMono-Regular,Consolas,monospace;-webkit-user-select:none;user-select:none;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}.preset-row{display:flex;gap:6px;margin-bottom:9px}.preset-btn{flex:1 1 0;min-width:0;height:22px;padding:0 2px;font-size:.63rem;letter-spacing:.2px;background:none;border:none;border-bottom:1.5px solid rgba(255,255,255,.18);color:var(--slate-dim);border-radius:0;cursor:pointer;transition:all .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;text-align:center}.preset-btn.active{color:var(--gold-champagne);border-bottom-color:var(--gold-champagne);background:none}.control-group{margin-bottom:7px}.control-label{display:flex;justify-content:space-between;align-items:baseline;font-size:.68rem;color:var(--slate-dim);margin-bottom:2px;gap:8px}.control-label span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0}.control-label span:last-child{color:var(--gold-champagne);font-family:SFMono-Regular,Consolas,monospace;font-size:.68rem;flex-shrink:0;text-align:right}input[type=range]{width:100%;-webkit-appearance:none;-moz-appearance:none;appearance:none;height:2px;background:#ffffff38;border-radius:1px;outline:none;touch-action:pan-x}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--gold-champagne);cursor:pointer;box-shadow:0 0 8px #e5c89b8c;transition:transform .15s ease}.btn-row{display:flex;gap:6px;margin-top:6px}button.action-btn{flex:1 1 0;min-width:0;height:22px;padding:0 4px;font-size:.63rem;letter-spacing:.3px;color:var(--slate-dim);background:#ffffff08;border:1px solid rgba(255,255,255,.12);border-radius:3px;cursor:pointer;transition:all .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;text-align:center}button.action-btn.active{color:var(--gold-champagne);border-color:var(--gold-champagne);background:#e5c89b1a}.hud-bottom-bar{position:fixed;bottom:24px;right:24px;display:flex;align-items:center;gap:8px;z-index:20}.hud-toggle-btn{padding:6px 14px;font-size:.7rem;letter-spacing:.6px;color:var(--slate-dim);background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid rgba(255,255,255,.15);border-radius:20px;cursor:pointer;transition:all .25s ease;white-space:nowrap;font-family:inherit;font-variant-numeric:tabular-nums;min-width:104px;text-align:center;display:inline-flex;align-items:center;justify-content:center;mix-blend-mode:difference}.hud-landscape-btn{display:none;min-width:50px;padding:6px 12px}@media (hover: hover){.lang-switch-btn:hover{color:var(--gold-champagne);border-color:var(--gold-champagne);background:#e5c89b1f}.preset-btn:hover{color:var(--gold-champagne);border-bottom-color:var(--gold-champagne);background:none}input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}button.action-btn:hover:not(.active){color:var(--platinum);border-color:var(--border-active)}.hud-toggle-btn:hover{color:var(--platinum);border-color:var(--border-active);background:#ffffff0f}}.hud-text-short{display:none}.hud-text-full{display:inline}@media (max-width: 680px){.hud-header{top:16px;left:18px;right:18px}.hud-header h1{font-size:1.05rem}.controls{width:calc(100vw - 28px);top:auto;bottom:58px;right:14px;max-height:42vh;padding:13px 15px;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}.controls>*{flex-shrink:0}.controls h2{order:0}.controls .preset-row{order:1;margin-bottom:0}.controls .btn-row{order:2}.controls .btn-row+.btn-row{margin-bottom:9px}.controls .control-group{order:4}.controls .control-group:has(#slider-scale){order:3}.telemetry{display:none}.fps-mini{display:block;position:fixed;bottom:16px;left:14px;z-index:10;pointer-events:none;font-family:SFMono-Regular,Consolas,monospace;font-size:.68rem;color:var(--ok-green);mix-blend-mode:difference;font-variant-numeric:tabular-nums}.hud-text-short{display:inline}.hud-text-full{display:none}.hud-bottom-bar{bottom:16px;right:14px;gap:6px}.hud-landscape-btn{display:inline-flex;padding:5px 12px;font-size:.66rem;min-width:50px}.hud-toggle-btn{padding:5px 12px;font-size:.66rem;min-width:50px}}body.fullscreen-landscape .hud-landscape-btn{display:inline-flex!important;padding:5px 12px;font-size:.66rem;min-width:50px}
@@ -712,9 +927,9 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
     <div class="control-group">
       <div class="control-label">
         <span data-i18n="lblCosmos">星尘丰度</span>
-        <span id="val-cosmos">1.05</span>
+        <span id="val-cosmos">1.00</span>
       </div>
-      <input type="range" id="slider-cosmos" min="0.00" max="2.00" step="0.05" value="1.05" />
+      <input type="range" id="slider-cosmos" min="0.00" max="2.00" step="0.05" value="1.00" />
     </div>
 
     <div class="control-group">
@@ -731,6 +946,14 @@ const S=document.getElementById("glcanvas"),e=S.getContext("webgl",{alpha:!1,dep
         <span id="val-bloom">0.80</span>
       </div>
       <input type="range" id="slider-bloom" min="0.00" max="2.00" step="0.05" value="0.80" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span data-i18n="lblScreenBloom">泛光</span>
+        <span id="val-screenbloom">0.70</span>
+      </div>
+      <input type="range" id="slider-screenbloom" min="0.00" max="2.00" step="0.05" value="0.70" />
     </div>
 
     <div class="control-group">
